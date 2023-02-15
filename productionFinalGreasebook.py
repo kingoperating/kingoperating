@@ -20,14 +20,14 @@ fullProductionPull = False
 numberOfDaysToPull = 30
 
 fileName = (
-    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingops\data\totalAssetsProduction.csv"
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\totalAssetsProduction.csv"
 )
 
 load_dotenv()  # load ENV
 
 # adding the Master Battery List for Analysis
 masterBatteryList = pd.read_csv(
-    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingops\data\masterBatteryList.csv"
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\masterBatteryList.csv"
 )
 
 # set some date variables we will need later
@@ -526,7 +526,7 @@ for i in range(0, len(wellIdList)):
     avgGasList.insert(i, runningTotalGas[i] / numberOfDaysBattery[i])
 
 fpReported = open(
-    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingops\data\yesterdayWellReport.csv", "w"
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\yesterdayWellReport.csv", "w"
 )
 headerString = "Battery ID,Battery Name,Oil Production,14-day Oil Average,Gas Production,14-day Gas Average, Oil Sold\n"
 fpReported.write(headerString)
@@ -615,7 +615,7 @@ totalAssetProduction.to_csv(
 
 # Opens Oil Change File for daily specific percent change calculations
 oilGasCustomNumbersFp = open(
-    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingops\data\oilgascustomnumbers.csv",
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\oilgascustomnumbers.csv",
     "w",
 )
 
@@ -680,7 +680,7 @@ results = response.json()
 # setting to length of results
 numEntries = len(results)
 
-fp = open(r".\kingops\data\oilSoldAccouting.csv", "w")
+fp = open(r".\kingoperating\data\oilSoldAccouting.csv", "w")
 headerString = "Date, Battery Name, Oil Sold Volume\n"
 fp.write(headerString)
 
