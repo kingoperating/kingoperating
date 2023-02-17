@@ -16,17 +16,18 @@ import numpy as np
 from openpyxl import Workbook
 
 # Set Well Name:
-nameOfWell = "millerrancha501mh"
+nameOfWell = "wu108"
 
 # Load in all files needed
-pathOfDailyReport = '.\\kingops\\data\\afe' + '\\' + nameOfWell + "\\" + "daily"
-pathOfAfe = r".\kingops\data\afe" + "\\" + nameOfWell
+pathOfDailyReport = '.\\kingoperating\\data\\afe' + \
+    '\\' + nameOfWell + "\\" + "daily"
+pathOfAfe = r".\kingoperating\data\afe" + "\\" + nameOfWell
 plannedCostFile = pathOfAfe + "\\" + nameOfWell + "planned.xlsx"
 plannedCostDepth = pd.read_excel(plannedCostFile)
 budgetRawString = pathOfAfe + "\\" + nameOfWell + "AfeOg.xlsx"
 actualSpendString = pathOfAfe + "\\" + nameOfWell + "ActualSpend.xlsx"
 masterMatchFile = pd.read_excel(
-    r".\kingops\data\afe\welldriveWolfepakMatch.xlsx")
+    r".\kingoperating\data\afe\welldriveWolfepakMatch.xlsx")
 pathOfMasterFile = pathOfAfe + "\\" + "fullreport.xlsx"
 masterAfe = pd.read_excel(pathOfMasterFile)
 actualWellCostWolfepak = pd.read_excel(actualSpendString)
