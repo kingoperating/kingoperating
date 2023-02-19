@@ -69,32 +69,6 @@ url = (
     + todayDay
 )
 
-# Oil Sold Accouting Check URL
-date100DaysAgo = dateToday - timedelta(days=100)
-date100Year = date100DaysAgo.strftime("%Y")
-date100Month = date100DaysAgo.strftime("%m")
-date100Day = date100DaysAgo.strftime("%d")
-productionInterval = (
-    "&start="
-    + date100Year
-    + "-"
-    + date100Month
-    + "-"
-    + date100Day
-    + "&end="
-)
-
-urlAccounting = (
-    "https://integration.greasebook.com/api/v1/batteries/daily-production?apiKey="
-    + str(os.getenv("GREASEBOOK_API_KEY"))
-    + productionInterval
-    + todayYear
-    + "-"
-    + todayMonth
-    + "-"
-    + todayDay
-)
-
 # make the API call
 response = requests.request(
     "GET",
@@ -174,8 +148,9 @@ accountingIdList = masterAllocationList["Subaccount"].tolist()
 apiList = masterAllocationList["API"].tolist()
 allocationList = masterAllocationList["Allocation Ratio"].tolist()
 
-k = 0
+k = 0  # variable for loop
 
+# gets length of totalAllocatedProduction
 initalSizeOfTotalAllocatedProduction = len(totalAllocatedProduction)
 
 # MASTER loop that goes through each of the items in the response
@@ -244,17 +219,19 @@ for currentRow in range(numEntries - 1, 0, -1):
     if batteryId == 25381 or batteryId == 25382:
         gasVolumeClean = 0
 
-    subAccountId = []
-    allocationRatio = []
-    subAccountIdIndex = []
+    subAccountId = []  # empty list for subaccount id
+    allocationRatio = []  # empty list for allocation ratio
+    subAccountIdIndex = []  # empty list for index of subaccount id INDEX - used for matching
 
+    # gets all the indexs that match the battery id (sometimes 1, sometimes more)
     batteryIndexId = [m for m, x in enumerate(
         listOfBatteryIds) if x == batteryId]
 
+    # if only 1 index - then just get the subaccount id and allocation ratio
     if len(batteryIndexId) == 1:
         subAccountId = accountingIdList[batteryIndexId[0]]
         allocationRatio = allocationList[batteryIndexId[0]]
-    else:
+    else:  # if more than 1 index - then need to check if they are the same subaccount id
         for t in range(len(batteryIndexId)):
             subAccountId.append(accountingIdList[batteryIndexId[t]])
             allocationRatio.append(allocationList[batteryIndexId[t]])
