@@ -489,6 +489,8 @@ for currentRow in range(numEntries - 1, 0, -1):
             clientName = "Colorado"
         elif clientName == "Scurry":
             clientName = "Scurry"
+        elif clientName == "Wyoming":
+            clientName == "Wyoming"
 
         # creates a newRow
         newRow = [
