@@ -100,6 +100,7 @@ else:
         "Well Accounting Name",
         "Oil Volume",
         "Gas Volume",
+        "Water Volume",
         "Oil Sold Volume"
     ]
     totalAccountingAllocatedProduction = pd.DataFrame(columns=headerList)
@@ -111,6 +112,7 @@ else:
         "Well Accounting Name",
         "Oil Volume",
         "Gas Volume",
+        "Water Volume",
         "Oil Sold Volume"
     ]
     totalComboCurveAllocatedProduction = pd.DataFrame(columns=headerCombocurve)
@@ -124,11 +126,16 @@ gotDayData = np.full([200], False)
 totalOilVolume = 0
 totalGasVolume = 0
 totalWaterVolume = 0
-savedWellOilVolume = []
-savedWellGasVolume = []
-savedWellWaterVolume = []
-savedWellOilSalesVolume = []
-savedBatteryId = []
+welopOilVolume = 0
+welopGasVolume = 0
+welopWaterVolume = 0
+welopOilSalesVolume = 0
+welopCounter = 0
+adamsRanchCounter = 0
+adamsRanchOilVolume = 0
+adamsRanchGasVolume = 0
+adamsRanchOilVolume = 0
+adamsRanchOilSalesVolume = 0
 
 # Convert all dates to str for comparison rollup
 todayYear = int(dateToday.strftime("%Y"))
@@ -168,6 +175,8 @@ kAccounting = 0  # variable for loop
 
 # gets length of totalAllocatedProduction
 initalSizeOfTotalAllocatedProduction = len(totalAccountingAllocatedProduction)
+
+lastDate = ""
 
 # MASTER loop that goes through each of the items in the response
 for currentRow in range(numEntries - 1, 0, -1):
@@ -239,44 +248,61 @@ for currentRow in range(numEntries - 1, 0, -1):
     allocationRatio = []  # empty list for allocation ratio
     subAccountIdIndex = []  # empty list for index of subaccount id INDEX - used for matching
 
+    wellAccountingName = []
+
     # gets all the indexs that match the battery id (sometimes 1, sometimes more)
     batteryIndexId = [m for m, x in enumerate(
         listOfBatteryIds) if x == batteryId]
-
+    if batteryIndexId == []:
+        continue
     # if only 1 index - then just get the subaccount id and allocation ratio
     if len(batteryIndexId) == 1:
         subAccountId = accountingIdList[batteryIndexId[0]]
         allocationRatio = allocationList[batteryIndexId[0]]
+        wellAccountingName = wellNameAccountingList[batteryIndexId[0]]
     else:  # if more than 1 index - then need to check if they are the same subaccount id
+
         for t in range(len(batteryIndexId)):
             subAccountId.append(accountingIdList[batteryIndexId[t]])
             allocationRatio.append(allocationList[batteryIndexId[t]])
-            subAccountIdIndex.append(batteryIndexId[t])
+            # subAccountIdIndex.append(batteryIndexId[t])
+            wellAccountingName.append(
+                wellNameAccountingList[batteryIndexId[t]])
 
-        temp = subAccountId[0]
-        for d in subAccountId:
-            if (temp != d):
-                same = False
-            else:
-                same = True
+        # temp = subAccountId[0]
+        # for d in subAccountId:
+        #     if (temp != d):
+        #         same = False
+        #     else:
+        #         same = True
 
-        if same == True:
-            otherSubAccountId = [m for m, x in enumerate(
-                accountingIdList) if x == subAccountId[0]]
+        # if same == True:
+        #     otherSubAccountId = [m for m, x in enumerate(
+        #         accountingIdList) if x == subAccountId[0]]
 
-            temp3 = []
-            for element in otherSubAccountId:
-                if element not in subAccountIdIndex:
-                    temp3.append(element)
+        #     temp3 = []
+        #     for element in otherSubAccountId:
+        #         if element not in subAccountIdIndex:
+        #             temp3.append(element)
 
-            otherBatteryIds = []
+        #     otherBatteryIds = []
 
-            for a in range(len(temp3)):
-                otherBatteryIds.append(int(listOfBatteryIds[temp3[a]]))
-
-    # WE ARE RIGHT HERE
+        #     for a in range(len(temp3)):
+        #         otherBatteryIds.append(int(listOfBatteryIds[temp3[a]]))
 
     dateString = str(month) + "/" + str(day) + "/" + str(year)
+
+    if lastDate != dateString:
+        welopCounter = 0
+        welopGasVolume = 0
+        welopOilVolume = 0
+        welopWaterVolume = 0
+        welopOilSalesVolume = 0
+        adamsRanchCounter = 0
+        adamsRanchGasVolume = 0
+        adamsRanchOilSalesVolume = 0
+        adamsRanchOilVolume = 0
+        adamsRanchWaterVolume = 0
 
     # Splits battery name up
     splitString = re.split("-|–", batteryName)
@@ -299,15 +325,34 @@ for currentRow in range(numEntries - 1, 0, -1):
         clientName = "KOPRM"
 
     if len(batteryIndexId) == 1:
-        newRow = [dateString, clientName, str(subAccountId), str(oilVolumeClean), str(
-            gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean)]
+        if batteryId != 23012 and batteryId != 23011:
+            newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(oilVolumeClean), str(
+                gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean)]
+            newRowComboCurve = [dateString, clientName, str(apiList[batteryIndexId[0]]), str(wellAccountingName), str(oilVolumeClean), str(
+                gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean)]
 
-        totalAccountingAllocatedProduction.loc[startingIndex +
-                                               kComboCurve] = newRow
-        totalComboCurveAllocatedProduction.loc[startingIndex +
-                                               kComboCurve] = newRow
-        kComboCurve = kComboCurve + 1
-        kAccounting = kAccounting + 1
+            totalAccountingAllocatedProduction.loc[startingIndex +
+                                                   kAccounting] = newRow
+            totalComboCurveAllocatedProduction.loc[startingIndex +
+                                                   kComboCurve] = newRowComboCurve
+            kComboCurve = kComboCurve + 1
+            kAccounting = kAccounting + 1
+
+        if batteryId == 23012 or batteryId == 23011:
+            adamsRanchOilVolume = adamsRanchOilVolume + oilVolumeClean
+            adamsRanchGasVolume = adamsRanchGasVolume + gasVolumeClean
+            adamsRanchWaterVolume = adamsRanchWaterVolume + waterVolumeClean
+            adamsRanchOilSalesVolume = adamsRanchOilSalesVolume + oilSalesDataClean
+            adamsRanchCounter = adamsRanchCounter + 1
+
+        if adamsRanchCounter == 2:
+            newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(adamsRanchOilVolume), str(
+                adamsRanchGasVolume), str(adamsRanchWaterVolume), str(adamsRanchOilSalesVolume)]
+            totalAccountingAllocatedProduction.loc[startingIndex +
+                                                   kAccounting] = newRow
+            kAccounting = kAccounting + 1
+            adamsRanchCounter = 0
+
     elif len(batteryIndexId) > 1:
         for j in range(len(batteryIndexId)):
             wellOilVolume = oilVolumeClean * allocationRatio[j]/100
@@ -315,22 +360,37 @@ for currentRow in range(numEntries - 1, 0, -1):
             wellWaterVolume = waterVolumeClean * allocationRatio[j]/100
             wellOilSalesVolume = oilSalesDataClean * allocationRatio[j]/100
 
-            newRow = [dateString, clientName, str(apiList[batteryIndexId[j]]), str(wellOilVolume), str(
+            newRow = [dateString, clientName, str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
                 wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume)]
 
             totalComboCurveAllocatedProduction.loc[startingIndex +
                                                    kComboCurve] = newRow
             kComboCurve = kComboCurve + 1
 
-        if otherBatteryIds != []:
-            savedWellOilVolume.append(wellOilVolume)
-            savedWellGasVolume.append(wellGasVolume)
-            savedWellWaterVolume.append(wellWaterVolume)
-            savedWellOilSalesVolume.append(wellOilSalesVolume)
-            savedBatteryId.append(batteryId)
+            if batteryId != 25381 and batteryId != 25382 and batteryId != 23012 and batteryId != 23011:
+                newRow = [dateString, clientName, str(subAccountId[j]), str(wellAccountingName[j]), str(wellOilVolume), str(
+                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume)]
+                totalAccountingAllocatedProduction.loc[startingIndex +
+                                                       kAccounting] = newRow
+                kAccounting = kAccounting + 1
 
-        kAccounting = kAccounting + 1
+        if batteryId == 25381 or batteryId == 25382:
+            welopOilVolume = welopOilVolume + oilVolumeClean
+            welopGasVolume = welopGasVolume + gasVolumeClean
+            welopWaterVolume = welopWaterVolume + waterVolumeClean
+            welopOilSalesVolume = welopOilSalesVolume + oilSalesDataClean
+            welopCounter = welopCounter + 1
 
-        junk = 1
+        if welopCounter == 2:
+            newRow = [dateString, clientName, str(subAccountId[0]), str(subAccountId[0]), str(welopOilVolume), str(
+                welopGasVolume), str(welopWaterVolume), str(welopOilSalesVolume)]
+            totalAccountingAllocatedProduction.loc[startingIndex +
+                                                   kAccounting] = newRow
+            kAccounting = kAccounting + 1
+            welopCounter = 0
+
+    lastDate = dateString
+
+# NEED TO ADD ONLY ADD LAST 30 DAYS
 
 print("Done Allocation Production")
