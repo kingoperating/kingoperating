@@ -265,33 +265,12 @@ for currentRow in range(numEntries - 1, 0, -1):
         for t in range(len(batteryIndexId)):
             subAccountId.append(accountingIdList[batteryIndexId[t]])
             allocationRatio.append(allocationList[batteryIndexId[t]])
-            # subAccountIdIndex.append(batteryIndexId[t])
             wellAccountingName.append(
                 wellNameAccountingList[batteryIndexId[t]])
 
-        # temp = subAccountId[0]
-        # for d in subAccountId:
-        #     if (temp != d):
-        #         same = False
-        #     else:
-        #         same = True
-
-        # if same == True:
-        #     otherSubAccountId = [m for m, x in enumerate(
-        #         accountingIdList) if x == subAccountId[0]]
-
-        #     temp3 = []
-        #     for element in otherSubAccountId:
-        #         if element not in subAccountIdIndex:
-        #             temp3.append(element)
-
-        #     otherBatteryIds = []
-
-        #     for a in range(len(temp3)):
-        #         otherBatteryIds.append(int(listOfBatteryIds[temp3[a]]))
-
     dateString = str(month) + "/" + str(day) + "/" + str(year)
 
+    # clears the counters if the date changes
     if lastDate != dateString:
         welopCounter = 0
         welopGasVolume = 0
@@ -391,6 +370,11 @@ for currentRow in range(numEntries - 1, 0, -1):
 
     lastDate = dateString
 
+totalAccountingAllocatedProduction.to_csv(
+    r".\kingoperating\data\accountingAllocatedProduction.csv", index=False)
+totalComboCurveAllocatedProduction.to_csv(
+    r".\kingoperating\data\comboCurveAllocatedProduction.csv", index=False)
+
 # NEED TO ADD ONLY ADD LAST 30 DAYS
 
-print("Done Allocation Production")
+print("Done Allocating Production")
