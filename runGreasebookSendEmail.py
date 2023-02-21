@@ -77,8 +77,8 @@ def send_email(email_recipient, email_subject, email_message):
     msg["Subject"] = email_subject
     msg.attach(MIMEText(email_message, "plain"))
 
-    productionFileGood = (r".\kingops\data\totalAssetsProduction.csv")
-    oilGasReportedFile = (r".\kingops\data\yesterdayWellReport.csv")
+    productionFileGood = (r".\kingoperating\data\totalAssetsProduction.csv")
+    oilGasReportedFile = (r".\kingoperating\data\yesterdayWellReport.csv")
 
     # OPENS EACH ATTACHMENTS
 
