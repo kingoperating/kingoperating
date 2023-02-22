@@ -33,13 +33,16 @@ totalAssetProduction = pd.read_csv(
     r".\kingoperating\data\totalAssetsProduction.csv")
 
 totalAssetProduction.rename(
-    columns={"Oil Volume": "oil", "Date": "date", "Gas Volume": "gas", "Client": "customText0"}, inplace=True)
+    columns={"Oil Volume": "oil", "Date": "date", "Gas Volume": "gas", "Client": "customText0", "Water Volume": "water"}, inplace=True)
 
 totalAssetProduction.replace({"South Texas": "KOSOU", "East Texas": "KOEAS", "Gulf Coast": "KOGCT",
                              "Midcon": "KOAND", "Permian Basin": "KOPRM", "Colorado": "WELOP", "Scurry": "KOPRM"}, inplace=True)
 
 totalAssetProduction.to_json(
-    r".\kingops\data\totalAssetsProduction.json", orient="records")
+    r".\kingoperating\data\totalAssetsProduction.json", orient="records")
+
+totalAssetProductionJson = totalAssetProduction.to_json(orient="records")
+cleanTotalAssetProduction = json.loads(totalAssetProductionJson)
 
 
 print("yay")

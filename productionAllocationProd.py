@@ -19,9 +19,12 @@ import numpy as np
 fullProductionPull = True
 numberOfDaysToPull = 30
 
-fileName = (
-    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\totalAssetsProductionAllocation.csv"
+fileNameAccounting = (
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\accountingAllocatedProduction.csv"
 )
+
+fileNameComboCurve = (
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\comboCurveAllocatedProduction.csv")
 
 load_dotenv()  # load ENV
 
@@ -39,9 +42,9 @@ dateYes = dateToday - timedelta(days=1)
 yesDayString = dateYes.strftime("%d")
 
 
-# Set production interval based on boolen CHANGE BACK TO MAY 2021
+# Set production interval based on boolen
 if fullProductionPull == True:
-    productionInterval = "&start=2022-12-01&end="
+    productionInterval = "&start=2021-05-01&end="
 else:
     dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
     dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
@@ -91,7 +94,8 @@ else:
 # checks if we need to pull all the data or just last specificed
 if fullProductionPull == False:
     # Opening Master CSV for total allocation production by Subaccount
-    totalAccountingAllocatedProduction = pd.read_csv(fileName)
+    totalAccountingAllocatedProduction = pd.read_csv(fileNameAccounting)
+    totalComboCurveAllocatedProduction = pd.read_csv(fileNameComboCurve)
 else:
     headerList = [
         "Date",
@@ -154,9 +158,9 @@ if fullProductionPull == False:
     day = int(splitDate[1])  # gets the correct day
     month = int(splitDate[0])  # gets the correct month
     year = int(splitDate[2])  # gets the correct
-    referenceTime15Day = dt.date(year, month, day) - \
-        timedelta(days=15)  # creates a reference time
-    dateOfInterest = referenceTime15Day.strftime(
+    referenceTimeDay = dt.date(year, month, day) - \
+        timedelta(days=numberOfDaysToPull)  # creates a reference time
+    dateOfInterest = referenceTimeDay.strftime(
         "%#m/%#d/%Y")  # converts to string
     startingIndex = listOfDates.index(
         dateOfInterest)  # create index surrounding
@@ -168,7 +172,8 @@ listOfBatteryIds = masterAllocationList["Id in Greasebooks"].tolist()
 wellNameAccountingList = masterAllocationList["Name in Accounting"].tolist()
 accountingIdList = masterAllocationList["Subaccount"].tolist()
 apiList = masterAllocationList["API"].tolist()
-allocationList = masterAllocationList["Allocation Ratio"].tolist()
+allocationOilList = masterAllocationList["Allocation Ratio Oil"].tolist()
+allocationGasList = masterAllocationList["Allocation Ratio Gas"].tolist()
 
 kComboCurve = 0  # variable for loop
 kAccounting = 0  # variable for loop
@@ -245,7 +250,8 @@ for currentRow in range(numEntries - 1, 0, -1):
         gasVolumeClean = 0
 
     subAccountId = []  # empty list for subaccount id
-    allocationRatio = []  # empty list for allocation ratio
+    allocationRatioOil = []  # empty list for allocation ratio oil
+    allocationRatioGas = []  # empty list for allocation ratio gas
     subAccountIdIndex = []  # empty list for index of subaccount id INDEX - used for matching
 
     wellAccountingName = []
@@ -258,13 +264,15 @@ for currentRow in range(numEntries - 1, 0, -1):
     # if only 1 index - then just get the subaccount id and allocation ratio
     if len(batteryIndexId) == 1:
         subAccountId = accountingIdList[batteryIndexId[0]]
-        allocationRatio = allocationList[batteryIndexId[0]]
+        allocationRatioOil = allocationOilList[batteryIndexId[0]]
+        allocationRatioGas = allocationGasList[batteryIndexId[0]]
         wellAccountingName = wellNameAccountingList[batteryIndexId[0]]
     else:  # if more than 1 index - then need to check if they are the same subaccount id
 
         for t in range(len(batteryIndexId)):
             subAccountId.append(accountingIdList[batteryIndexId[t]])
-            allocationRatio.append(allocationList[batteryIndexId[t]])
+            allocationRatioOil.append(allocationOilList[batteryIndexId[t]])
+            allocationRatioGas.append(allocationGasList[batteryIndexId[t]])
             wellAccountingName.append(
                 wellNameAccountingList[batteryIndexId[t]])
 
@@ -334,13 +342,19 @@ for currentRow in range(numEntries - 1, 0, -1):
 
     elif len(batteryIndexId) > 1:
         for j in range(len(batteryIndexId)):
-            wellOilVolume = oilVolumeClean * allocationRatio[j]/100
-            wellGasVolume = gasVolumeClean * allocationRatio[j]/100
-            wellWaterVolume = waterVolumeClean * allocationRatio[j]/100
-            wellOilSalesVolume = oilSalesDataClean * allocationRatio[j]/100
+            wellOilVolume = oilVolumeClean * allocationRatioOil[j]/100
+            wellGasVolume = gasVolumeClean * allocationRatioGas[j]/100
+            wellWaterVolume = waterVolumeClean * allocationRatioOil[j]/100
+            wellOilSalesVolume = oilSalesDataClean * allocationRatioOil[j]/100
 
-            newRow = [dateString, clientName, str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
-                wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume)]
+            # YOU ARE HERE
+            if batteryId != 25381 and batteryId != 25382:
+                newRow = [dateString, clientName, str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
+                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume)]
+                junk = 0
+            else:
+                newRow = [dateString, clientName, "0" + str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
+                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume)]
 
             totalComboCurveAllocatedProduction.loc[startingIndex +
                                                    kComboCurve] = newRow
@@ -372,8 +386,9 @@ for currentRow in range(numEntries - 1, 0, -1):
 
 totalAccountingAllocatedProduction.to_csv(
     r".\kingoperating\data\accountingAllocatedProduction.csv", index=False)
-totalComboCurveAllocatedProduction.to_csv(
-    r".\kingoperating\data\comboCurveAllocatedProduction.csv", index=False)
+totalComboCurveAllocatedProduction.to_json(
+    r".\kingoperating\data\comboCurveAllocatedProductionTest.json", orient="records")
+
 
 # NEED TO ADD ONLY ADD LAST 30 DAYS
 
