@@ -133,7 +133,7 @@ wellList = os.getenv("MASTER_BATTERY_LIST")
 
 # Body of the email mesasge
 
-message = ""
+message = "L.D Brown Unit is down - engineering is aware and troubleshooting \n\n"
 
 message = message + (
     "Oil production: "
@@ -223,7 +223,7 @@ craigHaesly = os.getenv("CRAIG_HAESLY")
 peterSnell = os.getenv("PETER_SNELL")
 garretStacey = os.getenv("GARRET_STACEY")
 grahamPatterson = os.getenv("GRAHAM_PATTERSON")
-michaelHaspel = os.getenv("MICHAEL_HASPEL")
+wesMinshall = os.getenv("WES_MINSHALL")
 
 # LIST TO SEND TO
 send_email(
@@ -234,7 +234,7 @@ send_email(
 
 # LIST TO SEND TO
 send_email(
-    michaelHaspel,
+    wesMinshall,
     subject,
     message,
 )
