@@ -41,7 +41,7 @@ yesDayString = dateYes.strftime("%d")
 
 # Set production interval based on boolen
 if fullProductionPull == True:
-    productionInterval = "&start=2021-05-01&end="
+    productionInterval = "&start=2021-03-01&end="
 else:
     dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
     dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
@@ -217,7 +217,7 @@ if fullProductionPull == False:
         dateOfInterest)  # create index surrounding
 else:
     startingIndex = 0
-    referenceTime15Day = dt.date(2021, 5, 1)
+    referenceTime15Day = dt.date(2021, 3, 1)
 
 # Gets list of Battery id's that are clean for printing
 listOfBatteryIds = masterBatteryList["Id"].tolist()
