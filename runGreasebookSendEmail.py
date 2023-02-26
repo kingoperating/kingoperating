@@ -133,7 +133,7 @@ wellList = os.getenv("MASTER_BATTERY_LIST")
 
 # Body of the email mesasge
 
-message = "L.D Brown Unit is down - engineering is aware and troubleshooting \n\n"
+message = ""
 
 message = message + (
     "Oil production: "
