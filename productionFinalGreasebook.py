@@ -573,6 +573,7 @@ fpReported.close()
 notReportedListOil = []
 notReportedListGas = []
 pumperNotReportedList = []
+numberOfNotReported = 0
 
 for i in range(0, len(wellIdList)):
     if wellOilVolumeTwoDayAgo[i] == "No Data Reported" and rollingFourteenDayPerWellOil[i] > 0:
@@ -580,6 +581,7 @@ for i in range(0, len(wellIdList)):
         goodBatteryNameWrite = goodBatteryNames[index]
         notReportedListOil.append(goodBatteryNameWrite)
         pumperName = pumperNames[index]
+        numberOfNotReported = numberOfNotReported + 1
         if pumperName not in pumperNotReportedList:
             pumperNotReportedList.append(pumperName)
     if wellGasVolumeTwoDayAgo[i] == "No Data Reported" and rollingFourteenDayPerWellGas[i] > 0:
@@ -589,6 +591,10 @@ for i in range(0, len(wellIdList)):
         pumperName = pumperNames[index]
         if pumperName not in pumperNotReportedList:
             pumperNotReportedList.append(pumperName)
+
+numberOfBatteries = len(wellIdList)
+percentNotReported = (len(notReportedListOil) +
+                      len(notReportedListGas)) / numberOfBatteries
 
 # Oil and gas daily change numbers
 oilChangeDaily = round((twoDayOilVolume - threeDayOilVolume), 2)
@@ -621,7 +627,7 @@ oilGasCustomNumbersFp = open(
     "w",
 )
 
-headerString = "Daily Oil Change,Daily Gas Change, 7-day Oil Percent Change, 7-day Gas Percent Change, Two Day Ago Oil Volume, Two Day Ago Gas Volume, Increase/Decrease Oil, Increase/Decrease Gas\n"
+headerString = "Daily Oil Change,Daily Gas Change, 7-day Oil Percent Change, 7-day Gas Percent Change, Two Day Ago Oil Volume, Two Day Ago Gas Volume, Increase/Decrease Oil, Increase/Decrease Gas, Percent Not Reported\n"
 
 oilGasCustomNumbersFp.write(headerString)
 
@@ -641,6 +647,8 @@ outputString = (
     + increaseDecreaseOil
     + ","
     + increaseDecreaseGas
+    + ","
+    + str(percentNotReported)
 )
 
 oilGasCustomNumbersFp.write(outputString)
