@@ -27,7 +27,7 @@ load_dotenv()  # load ENV
 
 # adding the Master Battery List for Analysis
 masterBatteryList = pd.read_csv(
-    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\masterBatteryList.csv"
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\masterBatteryList.csv", encoding="windows-1252"
 )
 
 # set some date variables we will need later
