@@ -44,7 +44,7 @@ yesDayString = dateYes.strftime("%d")
 
 # Set production interval based on boolen
 if fullProductionPull == True:
-    productionInterval = "&start=2021-05-01&end="
+    productionInterval = "&start=2021-04-01&end="
 else:
     dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
     dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
@@ -310,6 +310,8 @@ for currentRow in range(numEntries - 1, 0, -1):
         clientName = "WELOP"
     elif clientName == "Scurry ":
         clientName = "KOPRM"
+    elif clientName == "Wyoming":
+        clientName = "KOWYM"
 
     if len(batteryIndexId) == 1:
         if batteryId != 23012 and batteryId != 23011:
