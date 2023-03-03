@@ -59,7 +59,7 @@ keltonTestData = [{
 
 projectId = "64021df74295aa0012e4e3ea"
 
-url = "https://api.combocurve.com/v1/projects/" + projectId + "/daily-productions"
+url = "https://api.combocurve.com/v1/projects/daily-productions"
 auth_headers = combocurve_auth.get_auth_headers()
 
 response = requests.put(url, headers=auth_headers, json=keltonTestData)
