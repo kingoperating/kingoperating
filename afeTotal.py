@@ -16,7 +16,7 @@ import numpy as np
 from openpyxl import Workbook
 
 # Set Well Name:
-nameOfWell = "millerrancha501mh"
+nameOfWell = "kinga199cv1h"
 
 # Load in all files needed
 pathOfDailyReport = '.\\kingoperating\\data\\afe' + \
@@ -33,7 +33,8 @@ masterAfe = pd.read_excel(pathOfMasterFile)
 actualWellCostWolfepak = pd.read_excel(actualSpendString)
 budgetRawFile = pd.read_excel(budgetRawString)
 drillingDayDescriptionPath = "C:\\Users\\mtanner\\OneDrive - King Operating\\Drilling - KOC\\daysdepthdescription.xlsx"
-#descriptionFile = pd.read_excel(drillingDayDescriptionPath, sheet_name=nameOfWell)
+descriptionFile = pd.read_excel(
+    drillingDayDescriptionPath, sheet_name=nameOfWell)
 
 
 # Create all clean export files needed and write the header strings
@@ -43,7 +44,7 @@ daysVsDepthFileName = pathOfAfe + "\\" + nameOfWell + "daysvsdepth.csv"
 daysVsDepthFp = open(daysVsDepthFileName, "w")
 headerString = "Date, Account Number, Depth, Daily Cost Estimate, Description\n"
 dailyItemCostFp.write(headerString)
-headerString = "Date, Days, Hours, Planned Depth, Planned Cost, Daily, Daily Cost Estimated, Actual Depth, Cumulative Cost\n"
+headerString = "Date, Days, Hours, Planned Depth, Planned Cost, Daily, Daily Cost Estimated, Actual Depth, Cumulative Cost,Daily Description\n"
 daysVsDepthFp.write(headerString)
 
 masterAfe = masterAfe.fillna(0)  # fill all emptys with 0
