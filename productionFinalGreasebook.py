@@ -14,7 +14,6 @@ from dotenv import load_dotenv
 import pandas as pd
 import numpy as np
 
-# TEST
 # 30 Day Or Full? If False - only looking at last 30 days and appending.
 fullProductionPull = False
 numberOfDaysToPull = 30
