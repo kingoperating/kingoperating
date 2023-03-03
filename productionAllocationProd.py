@@ -16,7 +16,7 @@ import numpy as np
 
 
 # 30 Day Or Full? If False - only looking at last 30 days and appending.
-fullProductionPull = True
+fullProductionPull = False
 numberOfDaysToPull = 30
 
 fileNameAccounting = (
@@ -117,7 +117,8 @@ else:
         "Oil Volume",
         "Gas Volume",
         "Water Volume",
-        "Oil Sold Volume"
+        "Oil Sold Volume",
+        "Data Source"
     ]
     totalComboCurveAllocatedProduction = pd.DataFrame(columns=headerCombocurve)
 
@@ -318,7 +319,7 @@ for currentRow in range(numEntries - 1, 0, -1):
             newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(oilVolumeClean), str(
                 gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean)]
             newRowComboCurve = [dateString, clientName, str(apiList[batteryIndexId[0]]), str(wellAccountingName), str(oilVolumeClean), str(
-                gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean)]
+                gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean), "internal"]
 
             totalAccountingAllocatedProduction.loc[startingIndex +
                                                    kAccounting] = newRow
@@ -352,11 +353,11 @@ for currentRow in range(numEntries - 1, 0, -1):
             # YOU ARE HERE
             if batteryId != 25381 and batteryId != 25382:
                 newRow = [dateString, clientName, str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
-                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume)]
+                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "internal"]
                 junk = 0
             else:
                 newRow = [dateString, clientName, "0" + str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
-                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume)]
+                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "internal"]
 
             totalComboCurveAllocatedProduction.loc[startingIndex +
                                                    kComboCurve] = newRow
@@ -388,6 +389,8 @@ for currentRow in range(numEntries - 1, 0, -1):
 
 totalAccountingAllocatedProduction.to_csv(
     r".\kingoperating\data\accountingAllocatedProduction.csv", index=False)
+totalComboCurveAllocatedProduction.to_csv(
+    r".\kingoperating\data\comboCurveAllocatedProduction.csv", index=False)
 totalComboCurveAllocatedProduction.to_json(
     r".\kingoperating\data\comboCurveAllocatedProductionTest.json", orient="records")
 
