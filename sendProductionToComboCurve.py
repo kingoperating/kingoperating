@@ -20,9 +20,9 @@ from combocurve_api_v1.pagination import get_next_page_url
 load_dotenv()  # load enviroment variables
 
 # connect to service account
-service_account = ServiceAccount.from_file(os.getenv("API_SEC_CODE"))
+service_account = ServiceAccount.from_file(os.getenv("API_SEC_CODE_LIVE"))
 # set API Key from enviroment variable
-api_key = os.getenv("API_KEY_PASS")
+api_key = os.getenv("API_KEY_PASS_LIVE")
 # specific Python ComboCurve authentication
 combocurve_auth = ComboCurveAuth(service_account, api_key)
 
@@ -50,16 +50,16 @@ cleanTotalAssetProduction = json.loads(totalAssetProductionJson)
 
 keltonTestData = [{
     "date": "2021-05-01",
-    "chosenID": "42483310150000",
-    "oil": 0.83,
+    "chosenID": "42357337470000",
+    "oil": 1,
     "gas": 73.0,
     "water": 60.0,
-    "dataSource": "other"
+    "dataSource": "di"
 }]
 
 projectId = "64021df74295aa0012e4e3ea"
 
-url = "https://api.combocurve.com/v1/projects/daily-productions"
+url = "https://api.combocurve.com/v1/daily-productions"
 auth_headers = combocurve_auth.get_auth_headers()
 
 response = requests.put(url, headers=auth_headers, json=keltonTestData)

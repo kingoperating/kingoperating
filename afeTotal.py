@@ -60,6 +60,8 @@ totalDateAllFile = []
 totalDepthAllFile = []
 totalCumulativeCost = []
 
+descriptionDateList = descriptionFile["Date"].tolist()
+
 timeStampList = masterAfe["textbox51"].tolist()
 timeStampCleanList = list(set(timeStampList))
 
@@ -132,6 +134,11 @@ for i in range(0, len(masterAfe)):
         if foundStartDate == 1 and activity == "Drilling":
             row = plannedCostDepth.iloc[day]
             lastDateClean = lastDate.strftime("%m/%d/%Y")
+            if lastDate in descriptionDateList:
+                index = descriptionDateList.index(lastDate)
+                description = descriptionFile["Description"].iloc[index]
+            else:
+                description = ""
             outputString = (
                 lastDateClean
                 + ","
@@ -150,6 +157,8 @@ for i in range(0, len(masterAfe)):
                 + str(lastMeasuredDepth)
                 + ","
                 + str(cumulativeCost * -1)
+                + ","
+                + str(description)
                 + "\n"
             )
             daysVsDepthFp.write(outputString)
@@ -163,6 +172,12 @@ for i in range(0, len(masterAfe)):
 cumulativeCost = cumulativeCost + totalDailyCost
 row = plannedCostDepth.iloc[day]
 lastDateClean = lastDate.strftime("%m/%d/%Y")
+if lastDate in descriptionDateList:
+    index = descriptionDateList.index(lastDate)
+    description = descriptionFile["Description"].iloc[index]
+else:
+    description = ""
+
 outputString = (
     lastDateClean
     + ","
@@ -181,6 +196,8 @@ outputString = (
     + str(lastMeasuredDepth)
     + ","
     + str(cumulativeCost * -1)
+    + ","
+    + str(description)
     + "\n"
 )
 
@@ -200,6 +217,8 @@ for i in range(day + 1, len(plannedCostDepth)):
         + str(row["PLAN COST"] * -1)
         + ","
         + str(row["DAILY"] * -1)
+        + ","
+        + ""
         + ","
         + ""
         + ","
