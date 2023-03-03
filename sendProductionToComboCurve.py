@@ -33,10 +33,10 @@ totalAssetProduction = pd.read_csv(
     r".\kingoperating\data\comboCurveAllocatedProduction.csv")
 
 totalAssetProduction = totalAssetProduction.drop(
-    ["Oil Sold Volume", "Well Accounting Name"], axis=1)
+    ["Oil Sold Volume", "Well Accounting Name", "Client"], axis=1)
 
 totalAssetProduction.rename(
-    columns={"Oil Volume": "oil", "Date": "date", "Gas Volume": "gas", "Client": "customText0", "Water Volume": "water", "API": "chosenID", "Data Source": "dataSource"}, inplace=True)
+    columns={"Oil Volume": "oil", "Date": "date", "Gas Volume": "gas", "Water Volume": "water", "API": "chosenID", "Data Source": "dataSource"}, inplace=True)
 
 
 totalAssetProduction.replace({"South Texas": "KOSOU", "East Texas": "KOEAS", "Gulf Coast": "KOGCT",
@@ -49,15 +49,17 @@ totalAssetProductionJson = totalAssetProduction.to_json(orient="records")
 cleanTotalAssetProduction = json.loads(totalAssetProductionJson)
 
 keltonTestData = [{
-    "date": "2021-04-01",
+    "date": "2021-05-01",
     "chosenID": "42483310150000",
     "oil": 0.83,
     "gas": 73.0,
-    "water": 50.0,
-    "dataSource": "di"
+    "water": 60.0,
+    "dataSource": "other"
 }]
 
-url = "https://api.combocurve.com/v1/daily-productions"
+projectId = "64021df74295aa0012e4e3ea"
+
+url = "https://api.combocurve.com/v1/projects/" + projectId + "/daily-productions"
 auth_headers = combocurve_auth.get_auth_headers()
 
 response = requests.put(url, headers=auth_headers, json=keltonTestData)
