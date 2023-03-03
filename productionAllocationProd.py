@@ -320,7 +320,7 @@ for currentRow in range(numEntries - 1, 0, -1):
             newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(oilVolumeClean), str(
                 gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean)]
             newRowComboCurve = [dateStringComboCurve, clientName, str(apiList[batteryIndexId[0]]), str(wellAccountingName), str(oilVolumeClean), str(
-                gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean), "internal"]
+                gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean), "di"]
 
             totalAccountingAllocatedProduction.loc[startingIndex +
                                                    kAccounting] = newRow
@@ -354,11 +354,11 @@ for currentRow in range(numEntries - 1, 0, -1):
             # YOU ARE HERE
             if batteryId != 25381 and batteryId != 25382:
                 newRow = [dateStringComboCurve, clientName, str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
-                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "internal"]
+                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "di"]
                 junk = 0
             else:
                 newRow = [dateStringComboCurve, clientName, "0" + str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
-                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "internal"]
+                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "di"]
 
             totalComboCurveAllocatedProduction.loc[startingIndex +
                                                    kComboCurve] = newRow
