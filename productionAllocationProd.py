@@ -269,7 +269,7 @@ for currentRow in range(numEntries - 1, 0, -1):
         allocationRatioGas = allocationGasList[batteryIndexId[0]]
         wellAccountingName = wellNameAccountingList[batteryIndexId[0]]
     else:  # if more than 1 index - then need to check if they are the same subaccount id
-
+        # gets allocation for each subaccount
         for t in range(len(batteryIndexId)):
             subAccountId.append(accountingIdList[batteryIndexId[t]])
             allocationRatioOil.append(allocationOilList[batteryIndexId[t]])
@@ -315,6 +315,7 @@ for currentRow in range(numEntries - 1, 0, -1):
     elif clientName == "Wyoming":
         clientName = "KOWYM"
 
+    # CORE LOGIC FOR WELLOP
     if len(batteryIndexId) == 1:
         if batteryId != 23012 and batteryId != 23011:
             newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(oilVolumeClean), str(
@@ -323,11 +324,11 @@ for currentRow in range(numEntries - 1, 0, -1):
                 gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean), "di"]
 
             totalAccountingAllocatedProduction.loc[startingIndex +
-                                                   kAccounting] = newRow
+                                                   kAccounting] = newRow  # sets new row to accounting
             totalComboCurveAllocatedProduction.loc[startingIndex +
-                                                   kComboCurve] = newRowComboCurve
-            kComboCurve = kComboCurve + 1
-            kAccounting = kAccounting + 1
+                                                   kComboCurve] = newRowComboCurve  # sets new row to combo curve
+            kComboCurve = kComboCurve + 1  # counter for combo curve
+            kAccounting = kAccounting + 1  # counter for accounting
 
         if batteryId == 23012 or batteryId == 23011:
             adamsRanchOilVolume = adamsRanchOilVolume + oilVolumeClean
@@ -336,6 +337,7 @@ for currentRow in range(numEntries - 1, 0, -1):
             adamsRanchOilSalesVolume = adamsRanchOilSalesVolume + oilSalesDataClean
             adamsRanchCounter = adamsRanchCounter + 1
 
+        # Handles Adams Ranch and the case where 2 wells feed into 1 subaccount but 2 batteries
         if adamsRanchCounter == 2:
             newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(adamsRanchOilVolume), str(
                 adamsRanchGasVolume), str(adamsRanchWaterVolume), str(adamsRanchOilSalesVolume)]
@@ -395,7 +397,5 @@ totalComboCurveAllocatedProduction.to_csv(
 totalComboCurveAllocatedProduction.to_json(
     r".\kingoperating\data\comboCurveAllocatedProductionTest.json", orient="records")
 
-
-# NEED TO ADD ONLY ADD LAST 30 DAYS
 
 print("Done Allocating Production")
