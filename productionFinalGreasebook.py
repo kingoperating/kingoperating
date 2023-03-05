@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 
 # 30 Day Or Full? If False - only looking at last 30 days and appending.
-fullProductionPull = True
+fullProductionPull = False
 numberOfDaysToPull = 30
 
 fileName = (
