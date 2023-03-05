@@ -395,7 +395,7 @@ totalAccountingAllocatedProduction.to_csv(
 totalComboCurveAllocatedProduction.to_csv(
     r".\kingoperating\data\comboCurveAllocatedProduction.csv", index=False)
 totalComboCurveAllocatedProduction.to_json(
-    r".\kingoperating\data\comboCurveAllocatedProductionTest.json", orient="records")
+    r".\kingoperating\data\comboCurveAllocatedProduction.json", orient="records")
 
 
 print("Done Allocating Production")
