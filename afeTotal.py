@@ -16,7 +16,7 @@ import numpy as np
 from openpyxl import Workbook
 
 # Set Well Name:
-nameOfWell = "ayres79v"
+nameOfWell = "kinga199cv1h"
 
 # Load in all files needed
 pathOfDailyReport = '.\\kingoperating\\data\\afe' + \
