@@ -37,7 +37,7 @@ totalAssetProduction = totalAssetProduction.astype({"API": "int64"})
 totalAssetProduction = totalAssetProduction.astype({"API": "string"})
 
 # helps when uploading to ComboCurve to check for length of data (can only send 20,000 data points at a time)
-print(len(totalAssetProduction))
+print("Length of Total Asset Production: " + str(len(totalAssetProduction)))
 
 # slices the data to only send the last 20,000 data points
 totalAssetProduction = totalAssetProduction.iloc[80000:]
@@ -60,7 +60,7 @@ totalAssetProductionJson = totalAssetProduction.to_json(
 cleanTotalAssetProduction = json.loads(totalAssetProductionJson)
 
 # prints length as final check (should be less than 20,000)
-print(len(cleanTotalAssetProduction))
+print("Length of Sliced Data: " + str(len(cleanTotalAssetProduction)))
 
 # test data
 testData = [{
@@ -82,7 +82,14 @@ response = requests.put(url, headers=auth_headers,
                         json=cleanTotalAssetProduction)
 
 responseCode = response.status_code  # sets response code to the current state
+responseText = response.text  # sets response text to the current state
 
-print(responseCode)
+print("Response Code: " + str(responseCode))  # prints response code
+
+if "successCount" in responseText:  # checks if the response text contains successCount
+    # finds the index of successCount
+    # prints the successCount and the number of data points sent
+    indexOfSuccessFail = responseText.index("successCount")
+    print(responseText[indexOfSuccessFail:])
 
 print("yay")
