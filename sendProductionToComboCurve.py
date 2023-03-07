@@ -50,7 +50,7 @@ yesDayString = dateYes.strftime("%d")
 if pullFromAllocation == False:
 
     # set the interval for the API call
-    numberOfDaysToPull = 30
+    numberOfDaysToPull = 1000
     dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
     dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
     dateThirtyDaysMonth = dateThirtyDays.strftime("%m")
@@ -287,7 +287,7 @@ if pullFromAllocation == False:
 
         # CORE LOGIC FOR WELLOP
         if len(batteryIndexId) == 1:
-            if batteryId != 23012 and batteryId != 23011:
+            if batteryId != 23012:
                 newRowComboCurve = [dateStringComboCurve, clientName, apiHelpList[batteryIndexId[0]], wellAccountingName, oilVolumeClean,
                                     gasVolumeClean, waterVolumeClean, oilSalesDataClean, "di"]
 
@@ -295,7 +295,7 @@ if pullFromAllocation == False:
                                                        kComboCurve] = newRowComboCurve  # sets new row to combo curve
                 kComboCurve = kComboCurve + 1  # counter for combo curve
 
-            if batteryId == 23012 or batteryId == 23011:
+            if batteryId == 23012:
                 adamsRanchOilVolume = adamsRanchOilVolume + oilVolumeClean
                 adamsRanchGasVolume = adamsRanchGasVolume + gasVolumeClean
                 adamsRanchWaterVolume = adamsRanchWaterVolume + waterVolumeClean
@@ -314,6 +314,7 @@ if pullFromAllocation == False:
                     newRow = [dateStringComboCurve, clientName, apiHelpList[batteryIndexId[j]], wellAccountingName[j], wellOilVolume,
                               wellGasVolume, wellWaterVolume, wellOilSalesVolume, "di"]
                     junk = 0
+
                 else:
                     newRow = [dateStringComboCurve, clientName, "0" + apiHelpList[batteryIndexId[j]], wellAccountingName[j], wellOilVolume,
                               wellGasVolume, wellWaterVolume, wellOilSalesVolume, "di"]
@@ -343,6 +344,9 @@ totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.astype({
 # helps when uploading to ComboCurve to check for length of data (can only send 20,000 data points at a time)
 print("Length of Total Asset Production: " +
       str(len(totalComboCurveAllocatedProduction)))
+
+totalComboCurveAllocatedProduction.drop(
+    totalComboCurveAllocatedProduction[totalComboCurveAllocatedProduction["API"] != "15119210510000"].index, inplace=True)
 
 # drops columns that are not needed
 totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.drop(
