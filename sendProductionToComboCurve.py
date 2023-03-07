@@ -50,7 +50,7 @@ yesDayString = dateYes.strftime("%d")
 if pullFromAllocation == False:
 
     # set the interval for the API call
-    numberOfDaysToPull = 750
+    numberOfDaysToPull = 45
     dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
     dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
     dateThirtyDaysMonth = dateThirtyDays.strftime("%m")
@@ -344,9 +344,6 @@ totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.astype({
 # helps when uploading to ComboCurve to check for length of data (can only send 20,000 data points at a time)
 print("Length of Total Asset Production: " +
       str(len(totalComboCurveAllocatedProduction)))
-
-totalComboCurveAllocatedProduction.drop(
-    totalComboCurveAllocatedProduction[totalComboCurveAllocatedProduction["Oil Sold Volume"] == 0.0].index, inplace=True)
 
 # drops columns that are not needed
 totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.drop(
