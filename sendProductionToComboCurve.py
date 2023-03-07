@@ -378,7 +378,7 @@ testData = [{
 }]
 
 
-# sets url to daily production
+# sets url to daily production for combo curve for daily production
 url = "https://api.combocurve.com/v1/daily-productions"
 auth_headers = combocurve_auth.get_auth_headers()  # authenticates ComboCurve
 
