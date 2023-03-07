@@ -19,6 +19,8 @@ from combocurve_api_v1.pagination import get_next_page_url
 
 load_dotenv()  # load enviroment variables
 
+pullFromAllocation = False
+
 # connect to service account
 service_account = ServiceAccount.from_file(os.getenv("API_SEC_CODE_LIVE"))
 # set API Key from enviroment variable
@@ -45,290 +47,298 @@ todayDay = dateToday.strftime("%d")
 dateYes = dateToday - timedelta(days=1)
 yesDayString = dateYes.strftime("%d")
 
-# set the interval for the API call
-numberOfDaysToPull = 30
-dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
-dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
-dateThirtyDaysMonth = dateThirtyDays.strftime("%m")
-dateThirtyDaysDay = dateThirtyDays.strftime("%d")
-productionInterval = (
-    "&start="
-    + dateThirtyDaysYear
-    + "-"
-    + dateThirtyDaysMonth
-    + "-"
-    + dateThirtyDaysDay
-    + "&end="
-)
+if pullFromAllocation == False:
 
-# Master API call to Greasebooks
-url = (
-    "https://integration.greasebook.com/api/v1/batteries/daily-production?apiKey="
-    + str(os.getenv("GREASEBOOK_API_KEY"))
-    + productionInterval
-    + todayYear
-    + "-"
-    + todayMonth
-    + "-"
-    + todayDay
-)
+    # set the interval for the API call
+    numberOfDaysToPull = 30
+    dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
+    dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
+    dateThirtyDaysMonth = dateThirtyDays.strftime("%m")
+    dateThirtyDaysDay = dateThirtyDays.strftime("%d")
+    productionInterval = (
+        "&start="
+        + dateThirtyDaysYear
+        + "-"
+        + dateThirtyDaysMonth
+        + "-"
+        + dateThirtyDaysDay
+        + "&end="
+    )
 
-# make the API call
-response = requests.request(
-    "GET",
-    url,
-)
+    # Master API call to Greasebooks
+    url = (
+        "https://integration.greasebook.com/api/v1/batteries/daily-production?apiKey="
+        + str(os.getenv("GREASEBOOK_API_KEY"))
+        + productionInterval
+        + todayYear
+        + "-"
+        + todayMonth
+        + "-"
+        + todayDay
+    )
 
-responseCode = response.status_code  # sets response code to the current state
+    # make the API call
+    response = requests.request(
+        "GET",
+        url,
+    )
 
-# parse as json string
-results = response.json()
-# setting to length of results
-numEntries = len(results)
+    responseCode = response.status_code  # sets response code to the current state
 
-# checks to see if the GB API call was successful
-if responseCode == 200:
-    print("Status Code is 200")
-    print(str(numEntries) + " entries read")
-else:
-    print("The Status Code: " + str(response.status_code))
+    # parse as json string
+    results = response.json()
+    # setting to length of results
+    numEntries = len(results)
 
-# adds the header to string
-headerCombocurve = [
-    "Date",
-    "Client",
-    "API",
-    "Well Accounting Name",
-    "Oil Volume",
-    "Gas Volume",
-    "Water Volume",
-    "Oil Sold Volume",
-    "Data Source"
-]
+    # checks to see if the GB API call was successful
+    if responseCode == 200:
+        print("Status Code is 200")
+        print(str(numEntries) + " entries read")
+    else:
+        print("The Status Code: " + str(response.status_code))
 
-totalComboCurveAllocatedProduction = pd.DataFrame(columns=headerCombocurve)
+    # adds the header to string
+    headerCombocurve = [
+        "Date",
+        "Client",
+        "API",
+        "Well Accounting Name",
+        "Oil Volume",
+        "Gas Volume",
+        "Water Volume",
+        "Oil Sold Volume",
+        "Data Source"
+    ]
 
-wellIdList = []
-wellNameList = []
-wellIdOilSoldList = []
-wellVolumeOilSoldList = []
-gotDayData = np.full([200], False)
-totalOilVolume = 0
-totalGasVolume = 0
-totalWaterVolume = 0
-welopOilVolume = 0
-welopGasVolume = 0
-welopWaterVolume = 0
-welopOilSalesVolume = 0
-welopCounter = 0
-adamsRanchCounter = 0
-adamsRanchOilVolume = 0
-adamsRanchGasVolume = 0
-adamsRanchOilVolume = 0
-adamsRanchOilSalesVolume = 0
+    totalComboCurveAllocatedProduction = pd.DataFrame(columns=headerCombocurve)
 
-# Gets list of Battery id's that are clean for printing
-listOfBatteryIds = masterAllocationList["Id in Greasebooks"].tolist()
-wellNameAccountingList = masterAllocationList["Name in Accounting"].tolist()
-accountingIdList = masterAllocationList["Subaccount"].tolist()
-apiList = masterAllocationList["API"].tolist()
-allocationOilList = masterAllocationList["Allocation Ratio Oil"].tolist()
-allocationGasList = masterAllocationList["Allocation Ratio Gas"].tolist()
+    wellIdList = []
+    wellNameList = []
+    wellIdOilSoldList = []
+    wellVolumeOilSoldList = []
+    gotDayData = np.full([200], False)
+    totalOilVolume = 0
+    totalGasVolume = 0
+    totalWaterVolume = 0
+    welopOilVolume = 0
+    welopGasVolume = 0
+    welopWaterVolume = 0
+    welopOilSalesVolume = 0
+    welopCounter = 0
+    adamsRanchCounter = 0
+    adamsRanchOilVolume = 0
+    adamsRanchGasVolume = 0
+    adamsRanchOilVolume = 0
+    adamsRanchOilSalesVolume = 0
 
-apiHelpList = []
+    # Gets list of Battery id's that are clean for printing
+    listOfBatteryIds = masterAllocationList["Id in Greasebooks"].tolist()
+    wellNameAccountingList = masterAllocationList["Name in Accounting"].tolist(
+    )
+    accountingIdList = masterAllocationList["Subaccount"].tolist()
+    apiList = masterAllocationList["API"].tolist()
+    allocationOilList = masterAllocationList["Allocation Ratio Oil"].tolist()
+    allocationGasList = masterAllocationList["Allocation Ratio Gas"].tolist()
 
-for i in apiList:
-    apiHelpList.append(str(i).split(".")[0])
+    apiHelpList = []
 
-kComboCurve = 0  # variable for loop
-startingIndex = 0  # variable for loop
+    for i in apiList:
+        apiHelpList.append(str(i).split(".")[0])
 
-lastDate = ""
+    kComboCurve = 0  # variable for loop
+    startingIndex = 0  # variable for loop
 
-# gets length of totalAllocatedProduction
-initalSizeOfTotalAllocatedProduction = len(totalComboCurveAllocatedProduction)
+    lastDate = ""
 
-# MASTER loop that goes through each of the items in the response
-for currentRow in range(numEntries - 1, 0, -1):
-    row = results[currentRow]  # get row i in results
-    keys = list(row.items())  # pull out the headers
+    # gets length of totalAllocatedProduction
+    initalSizeOfTotalAllocatedProduction = len(
+        totalComboCurveAllocatedProduction)
 
-    # set some intial variables for core logic
-    oilDataExist = False
-    gasDataExist = False
-    waterDataExist = False
-    oilSalesDataExist = False
-    oilVolumeClean = 0
-    gasVolumeClean = 0
-    waterVolumeClean = 0
-    oilSalesDataClean = 0
+    # MASTER loop that goes through each of the items in the response
+    for currentRow in range(numEntries - 1, 0, -1):
+        row = results[currentRow]  # get row i in results
+        keys = list(row.items())  # pull out the headers
 
-    # Loops through each exposed API variable. If it exisits - get to correct variable
-    for idx, key in enumerate(keys):
-        if key[0] == "batteryId":
-            batteryId = row["batteryId"]
-        elif key[0] == "batteryName":
-            batteryName = row["batteryName"]
-        elif key[0] == "date":
-            date = row["date"]
-        # if reported, set to True, otherwise leave false
-        elif key[0] == "oil":
-            oilDataExist = True
-            oilVolumeRaw = row["oil"]
-            if oilVolumeRaw == "":  # if "" means it not reported
-                oilVolumeClean = 0
-            else:
-                oilVolumeClean = oilVolumeRaw
-        elif key[0] == "mcf":  # same as oil
-            gasDataExist = True
-            gasVolumeRaw = row["mcf"]
-            if gasVolumeRaw == "":
-                gasVolumeClean = 0
-            else:
-                gasVolumeClean = gasVolumeRaw
-        elif key[0] == "water":  # same as oil
-            waterDataExist = True
-            waterVolumeRaw = row["water"]
-            if waterVolumeRaw == "":
-                waterVolumeClean = 0
-            else:
-                waterVolumeClean = waterVolumeRaw
-        elif key[0] == "oilSales":
-            oilSalesDataExist = True
-            oilSalesDataRaw = row["oilSales"]
-            if oilSalesDataRaw == "":
-                oilSalesDataClean = 0
-            else:
-                oilSalesDataClean = oilSalesDataRaw
-
-    # spliting date correctly
-    splitDate = re.split("T", date)
-    splitDate2 = re.split("-", splitDate[0])
-    year = int(splitDate2[0])
-    month = int(splitDate2[1])
-    day = int(splitDate2[2])
-
-    # CORE LOGIC BEGINS FOR MASTER LOOP
-
-    # Colorado set MCF to zero
-    if batteryId == 25381 or batteryId == 25382:
+        # set some intial variables for core logic
+        oilDataExist = False
+        gasDataExist = False
+        waterDataExist = False
+        oilSalesDataExist = False
+        oilVolumeClean = 0
         gasVolumeClean = 0
+        waterVolumeClean = 0
+        oilSalesDataClean = 0
 
-    subAccountId = []  # empty list for subaccount id
-    allocationRatioOil = []  # empty list for allocation ratio oil
-    allocationRatioGas = []  # empty list for allocation ratio gas
-    subAccountIdIndex = []  # empty list for index of subaccount id INDEX - used for matching
+        # Loops through each exposed API variable. If it exisits - get to correct variable
+        for idx, key in enumerate(keys):
+            if key[0] == "batteryId":
+                batteryId = row["batteryId"]
+            elif key[0] == "batteryName":
+                batteryName = row["batteryName"]
+            elif key[0] == "date":
+                date = row["date"]
+            # if reported, set to True, otherwise leave false
+            elif key[0] == "oil":
+                oilDataExist = True
+                oilVolumeRaw = row["oil"]
+                if oilVolumeRaw == "":  # if "" means it not reported
+                    oilVolumeClean = 0
+                else:
+                    oilVolumeClean = oilVolumeRaw
+            elif key[0] == "mcf":  # same as oil
+                gasDataExist = True
+                gasVolumeRaw = row["mcf"]
+                if gasVolumeRaw == "":
+                    gasVolumeClean = 0
+                else:
+                    gasVolumeClean = gasVolumeRaw
+            elif key[0] == "water":  # same as oil
+                waterDataExist = True
+                waterVolumeRaw = row["water"]
+                if waterVolumeRaw == "":
+                    waterVolumeClean = 0
+                else:
+                    waterVolumeClean = waterVolumeRaw
+            elif key[0] == "oilSales":
+                oilSalesDataExist = True
+                oilSalesDataRaw = row["oilSales"]
+                if oilSalesDataRaw == "":
+                    oilSalesDataClean = 0
+                else:
+                    oilSalesDataClean = oilSalesDataRaw
 
-    wellAccountingName = []
+        # spliting date correctly
+        splitDate = re.split("T", date)
+        splitDate2 = re.split("-", splitDate[0])
+        year = int(splitDate2[0])
+        month = int(splitDate2[1])
+        day = int(splitDate2[2])
 
-    # gets all the indexs that match the battery id (sometimes 1, sometimes more)
-    batteryIndexId = [m for m, x in enumerate(
-        listOfBatteryIds) if x == batteryId]
-    if batteryIndexId == []:
-        continue
-    # if only 1 index - then just get the subaccount id and allocation ratio
-    if len(batteryIndexId) == 1:
-        subAccountId = accountingIdList[batteryIndexId[0]]
-        allocationRatioOil = allocationOilList[batteryIndexId[0]]
-        allocationRatioGas = allocationGasList[batteryIndexId[0]]
-        wellAccountingName = wellNameAccountingList[batteryIndexId[0]]
-    else:  # if more than 1 index - then need to check if they are the same subaccount id
-        # gets allocation for each subaccount
-        for t in range(len(batteryIndexId)):
-            subAccountId.append(accountingIdList[batteryIndexId[t]])
-            allocationRatioOil.append(allocationOilList[batteryIndexId[t]])
-            allocationRatioGas.append(allocationGasList[batteryIndexId[t]])
-            wellAccountingName.append(
-                wellNameAccountingList[batteryIndexId[t]])
+        # CORE LOGIC BEGINS FOR MASTER LOOP
 
-    dateString = str(month) + "/" + str(day) + "/" + str(year)
-    dateStringComboCurve = datetime.strptime(dateString, "%m/%d/%Y")
-
-    # clears the counters if the date changes
-    if lastDate != dateString:
-        welopCounter = 0
-        welopGasVolume = 0
-        welopOilVolume = 0
-        welopWaterVolume = 0
-        welopOilSalesVolume = 0
-        adamsRanchCounter = 0
-        adamsRanchGasVolume = 0
-        adamsRanchOilSalesVolume = 0
-        adamsRanchOilVolume = 0
-        adamsRanchWaterVolume = 0
-
-    # Splits battery name up
-    splitString = re.split("-|–", batteryName)
-    # sets client name to client name from ETX/STX and GCT
-    clientName = splitString[0]
-    # if field name exisits - add the batteryName
-    if clientName == "CWS ":
-        clientName = "KOSOU"
-    elif clientName == "Peak ":
-        clientName = "KOEAS"
-    elif clientName == "Otex ":
-        clientName = "KOGCT"
-    elif clientName == "Midcon ":
-        clientName = "KOAND"
-    elif clientName == "Wellman ":
-        clientName = "KOPRM"
-    elif clientName == "Wellington ":
-        clientName = "WELOP"
-    elif clientName == "Scurry ":
-        clientName = "KOPRM"
-    elif clientName == "Wyoming":
-        clientName = "KOWYM"
-
-    # CORE LOGIC FOR WELLOP
-    if len(batteryIndexId) == 1:
-        if batteryId != 23012 and batteryId != 23011:
-            newRowComboCurve = [dateStringComboCurve, clientName, apiHelpList[batteryIndexId[0]], wellAccountingName, oilVolumeClean,
-                                gasVolumeClean, waterVolumeClean, oilSalesDataClean, "di"]
-
-            totalComboCurveAllocatedProduction.loc[startingIndex +
-                                                   kComboCurve] = newRowComboCurve  # sets new row to combo curve
-            kComboCurve = kComboCurve + 1  # counter for combo curve
-
-        if batteryId == 23012 or batteryId == 23011:
-            adamsRanchOilVolume = adamsRanchOilVolume + oilVolumeClean
-            adamsRanchGasVolume = adamsRanchGasVolume + gasVolumeClean
-            adamsRanchWaterVolume = adamsRanchWaterVolume + waterVolumeClean
-            adamsRanchOilSalesVolume = adamsRanchOilSalesVolume + oilSalesDataClean
-            adamsRanchCounter = adamsRanchCounter + 1
-
-    elif len(batteryIndexId) > 1:
-        for j in range(len(batteryIndexId)):
-            wellOilVolume = oilVolumeClean * allocationRatioOil[j]/100
-            wellGasVolume = gasVolumeClean * allocationRatioGas[j]/100
-            wellWaterVolume = waterVolumeClean * allocationRatioOil[j]/100
-            wellOilSalesVolume = oilSalesDataClean * allocationRatioOil[j]/100
-
-            if batteryId != 25381 and batteryId != 25382:
-                newRow = [dateStringComboCurve, clientName, apiHelpList[batteryIndexId[j]], wellAccountingName[j], wellOilVolume,
-                          wellGasVolume, wellWaterVolume, wellOilSalesVolume, "di"]
-                junk = 0
-            else:
-                newRow = [dateStringComboCurve, clientName, "0" + apiHelpList[batteryIndexId[j]], wellAccountingName[j], wellOilVolume,
-                          wellGasVolume, wellWaterVolume, wellOilSalesVolume, "di"]
-
-            totalComboCurveAllocatedProduction.loc[startingIndex +
-                                                   kComboCurve] = newRow
-            kComboCurve = kComboCurve + 1
-
+        # Colorado set MCF to zero
         if batteryId == 25381 or batteryId == 25382:
-            welopOilVolume = welopOilVolume + oilVolumeClean
-            welopGasVolume = welopGasVolume + gasVolumeClean
-            welopWaterVolume = welopWaterVolume + waterVolumeClean
-            welopOilSalesVolume = welopOilSalesVolume + oilSalesDataClean
-            welopCounter = welopCounter + 1
+            gasVolumeClean = 0
 
-    lastDate = dateString
+        subAccountId = []  # empty list for subaccount id
+        allocationRatioOil = []  # empty list for allocation ratio oil
+        allocationRatioGas = []  # empty list for allocation ratio gas
+        subAccountIdIndex = []  # empty list for index of subaccount id INDEX - used for matching
 
+        wellAccountingName = []
+
+        # gets all the indexs that match the battery id (sometimes 1, sometimes more)
+        batteryIndexId = [m for m, x in enumerate(
+            listOfBatteryIds) if x == batteryId]
+        if batteryIndexId == []:
+            continue
+        # if only 1 index - then just get the subaccount id and allocation ratio
+        if len(batteryIndexId) == 1:
+            subAccountId = accountingIdList[batteryIndexId[0]]
+            allocationRatioOil = allocationOilList[batteryIndexId[0]]
+            allocationRatioGas = allocationGasList[batteryIndexId[0]]
+            wellAccountingName = wellNameAccountingList[batteryIndexId[0]]
+        else:  # if more than 1 index - then need to check if they are the same subaccount id
+            # gets allocation for each subaccount
+            for t in range(len(batteryIndexId)):
+                subAccountId.append(accountingIdList[batteryIndexId[t]])
+                allocationRatioOil.append(allocationOilList[batteryIndexId[t]])
+                allocationRatioGas.append(allocationGasList[batteryIndexId[t]])
+                wellAccountingName.append(
+                    wellNameAccountingList[batteryIndexId[t]])
+
+        dateString = str(month) + "/" + str(day) + "/" + str(year)
+        dateStringComboCurve = datetime.strptime(dateString, "%m/%d/%Y")
+
+        # clears the counters if the date changes
+        if lastDate != dateString:
+            welopCounter = 0
+            welopGasVolume = 0
+            welopOilVolume = 0
+            welopWaterVolume = 0
+            welopOilSalesVolume = 0
+            adamsRanchCounter = 0
+            adamsRanchGasVolume = 0
+            adamsRanchOilSalesVolume = 0
+            adamsRanchOilVolume = 0
+            adamsRanchWaterVolume = 0
+
+        # Splits battery name up
+        splitString = re.split("-|–", batteryName)
+        # sets client name to client name from ETX/STX and GCT
+        clientName = splitString[0]
+        # if field name exisits - add the batteryName
+        if clientName == "CWS ":
+            clientName = "KOSOU"
+        elif clientName == "Peak ":
+            clientName = "KOEAS"
+        elif clientName == "Otex ":
+            clientName = "KOGCT"
+        elif clientName == "Midcon ":
+            clientName = "KOAND"
+        elif clientName == "Wellman ":
+            clientName = "KOPRM"
+        elif clientName == "Wellington ":
+            clientName = "WELOP"
+        elif clientName == "Scurry ":
+            clientName = "KOPRM"
+        elif clientName == "Wyoming":
+            clientName = "KOWYM"
+
+        # CORE LOGIC FOR WELLOP
+        if len(batteryIndexId) == 1:
+            if batteryId != 23012 and batteryId != 23011:
+                newRowComboCurve = [dateStringComboCurve, clientName, apiHelpList[batteryIndexId[0]], wellAccountingName, oilVolumeClean,
+                                    gasVolumeClean, waterVolumeClean, oilSalesDataClean, "di"]
+
+                totalComboCurveAllocatedProduction.loc[startingIndex +
+                                                       kComboCurve] = newRowComboCurve  # sets new row to combo curve
+                kComboCurve = kComboCurve + 1  # counter for combo curve
+
+            if batteryId == 23012 or batteryId == 23011:
+                adamsRanchOilVolume = adamsRanchOilVolume + oilVolumeClean
+                adamsRanchGasVolume = adamsRanchGasVolume + gasVolumeClean
+                adamsRanchWaterVolume = adamsRanchWaterVolume + waterVolumeClean
+                adamsRanchOilSalesVolume = adamsRanchOilSalesVolume + oilSalesDataClean
+                adamsRanchCounter = adamsRanchCounter + 1
+
+        elif len(batteryIndexId) > 1:
+            for j in range(len(batteryIndexId)):
+                wellOilVolume = oilVolumeClean * allocationRatioOil[j]/100
+                wellGasVolume = gasVolumeClean * allocationRatioGas[j]/100
+                wellWaterVolume = waterVolumeClean * allocationRatioOil[j]/100
+                wellOilSalesVolume = oilSalesDataClean * \
+                    allocationRatioOil[j]/100
+
+                if batteryId != 25381 and batteryId != 25382:
+                    newRow = [dateStringComboCurve, clientName, apiHelpList[batteryIndexId[j]], wellAccountingName[j], wellOilVolume,
+                              wellGasVolume, wellWaterVolume, wellOilSalesVolume, "di"]
+                    junk = 0
+                else:
+                    newRow = [dateStringComboCurve, clientName, "0" + apiHelpList[batteryIndexId[j]], wellAccountingName[j], wellOilVolume,
+                              wellGasVolume, wellWaterVolume, wellOilSalesVolume, "di"]
+
+                totalComboCurveAllocatedProduction.loc[startingIndex +
+                                                       kComboCurve] = newRow
+                kComboCurve = kComboCurve + 1
+
+            if batteryId == 25381 or batteryId == 25382:
+                welopOilVolume = welopOilVolume + oilVolumeClean
+                welopGasVolume = welopGasVolume + gasVolumeClean
+                welopWaterVolume = welopWaterVolume + waterVolumeClean
+                welopOilSalesVolume = welopOilSalesVolume + oilSalesDataClean
+                welopCounter = welopCounter + 1
+
+        lastDate = dateString
+else:
+    totalComboCurveAllocatedProduction = pd.read_csv(
+        r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\comboCurveAllocatedProduction.csv")
+    totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.astype({
+                                                                                   "API": "string"})
 
 # converts API to int (removing decimals) and then back to string for JSON
 totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.astype({
                                                                                "Date": "string"})
-#totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.astype({ "Oil Volume": "string"})
 
 # helps when uploading to ComboCurve to check for length of data (can only send 20,000 data points at a time)
 print("Length of Total Asset Production: " +
@@ -338,7 +348,7 @@ print("Length of Total Asset Production: " +
 totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.drop(
     ["Oil Sold Volume", "Well Accounting Name", "Client"], axis=1)
 
-#totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.iloc[0:19999]
+totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.iloc[0:19999]
 
 # renames columns to match ComboCurve
 totalComboCurveAllocatedProduction.rename(
