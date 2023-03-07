@@ -50,7 +50,7 @@ yesDayString = dateYes.strftime("%d")
 if pullFromAllocation == False:
 
     # set the interval for the API call
-    numberOfDaysToPull = 1000
+    numberOfDaysToPull = 750
     dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
     dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
     dateThirtyDaysMonth = dateThirtyDays.strftime("%m")
@@ -346,17 +346,17 @@ print("Length of Total Asset Production: " +
       str(len(totalComboCurveAllocatedProduction)))
 
 totalComboCurveAllocatedProduction.drop(
-    totalComboCurveAllocatedProduction[totalComboCurveAllocatedProduction["API"] != "15119210510000"].index, inplace=True)
+    totalComboCurveAllocatedProduction[totalComboCurveAllocatedProduction["Oil Sold Volume"] == 0.0].index, inplace=True)
 
 # drops columns that are not needed
 totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.drop(
-    ["Oil Sold Volume", "Well Accounting Name", "Client"], axis=1)
+    ["Well Accounting Name", "Client"], axis=1)
 
 totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.iloc[0:19999]
 
 # renames columns to match ComboCurve
 totalComboCurveAllocatedProduction.rename(
-    columns={"Oil Volume": "oil", "Date": "date", "Gas Volume": "gas", "Water Volume": "water", "API": "chosenID", "Data Source": "dataSource"}, inplace=True)
+    columns={"Oil Volume": "oil", "Date": "date", "Gas Volume": "gas", "Water Volume": "water", "API": "chosenID", "Data Source": "dataSource", "Oil Sold Volume": "customNumber0"}, inplace=True)
 
 # exports to json for storage
 totalComboCurveAllocatedProduction.to_json(
