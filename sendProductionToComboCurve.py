@@ -50,7 +50,7 @@ yesDayString = dateYes.strftime("%d")
 if pullFromAllocation == False:
 
     # set the interval for the API call
-    numberOfDaysToPull = 45
+    numberOfDaysToPull = 30
     dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
     dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
     dateThirtyDaysMonth = dateThirtyDays.strftime("%m")
