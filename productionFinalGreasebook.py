@@ -16,7 +16,7 @@ import numpy as np
 
 # 30 Day Or Full? If False - only looking at last 30 days and appending.
 fullProductionPull = False
-numberOfDaysToPull = 30
+numberOfDaysToPull = 71
 
 fileName = (
     r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\totalAssetsProduction.csv"
