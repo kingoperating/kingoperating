@@ -50,7 +50,7 @@ yesDayString = dateYes.strftime("%d")
 if pullFromAllocation == False:
 
     # set the interval for the API call
-    numberOfDaysToPull = 30
+    numberOfDaysToPull = 720
     dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
     dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
     dateThirtyDaysMonth = dateThirtyDays.strftime("%m")
@@ -336,6 +336,10 @@ else:
         r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\comboCurveAllocatedProduction.csv")
     totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.astype({
                                                                                    "API": "string"})
+
+
+totalComboCurveAllocatedProduction.drop(
+    totalComboCurveAllocatedProduction[totalComboCurveAllocatedProduction["API"] != "35045219530000"].index, inplace=True)
 
 # converts API to int (removing decimals) and then back to string for JSON
 totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.astype({
