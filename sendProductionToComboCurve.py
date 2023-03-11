@@ -337,10 +337,6 @@ else:
     totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.astype({
                                                                                    "API": "string"})
 
-
-totalComboCurveAllocatedProduction.drop(
-    totalComboCurveAllocatedProduction[totalComboCurveAllocatedProduction["API"] != "35045219530000"].index, inplace=True)
-
 # converts API to int (removing decimals) and then back to string for JSON
 totalComboCurveAllocatedProduction = totalComboCurveAllocatedProduction.astype({
                                                                                "Date": "string"})
