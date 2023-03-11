@@ -15,7 +15,9 @@ import pandas as pd
 import numpy as np
 from openpyxl import Workbook
 
-# Set Well Name:
+# TIPS: ALWAYS need to have some transactions for this script to work
+
+# Set Well Name To Whatever well is needed:
 nameOfWell = "millerrancha501v"
 
 # Load in all files needed
