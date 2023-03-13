@@ -16,7 +16,7 @@ import numpy as np
 
 
 # 30 Day Or Full? If False - only looking at last 30 days and appending.
-fullProductionPull = True
+fullProductionPull = False
 numberOfDaysToPull = 30
 
 fileNameAccounting = (
@@ -278,7 +278,6 @@ for currentRow in range(numEntries - 1, 0, -1):
                 wellNameAccountingList[batteryIndexId[t]])
 
     dateString = str(month) + "/" + str(day) + "/" + str(year)
-    dateStringComboCurve = datetime.strptime(dateString, "%m/%d/%Y")
 
     # clears the counters if the date changes
     if lastDate != dateString:
@@ -320,7 +319,7 @@ for currentRow in range(numEntries - 1, 0, -1):
         if batteryId != 23012 and batteryId != 23011:
             newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(oilVolumeClean), str(
                 gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean)]
-            newRowComboCurve = [dateStringComboCurve, clientName, str(apiList[batteryIndexId[0]]), str(wellAccountingName), str(oilVolumeClean), str(
+            newRowComboCurve = [dateString, clientName, str(apiList[batteryIndexId[0]]), str(wellAccountingName), str(oilVolumeClean), str(
                 gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean), "di"]
 
             totalAccountingAllocatedProduction.loc[startingIndex +
@@ -355,11 +354,11 @@ for currentRow in range(numEntries - 1, 0, -1):
 
             # YOU ARE HERE
             if batteryId != 25381 and batteryId != 25382:
-                newRow = [dateStringComboCurve, clientName, str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
+                newRow = [dateString, clientName, str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
                     wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "di"]
                 junk = 0
             else:
-                newRow = [dateStringComboCurve, clientName, "0" + str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
+                newRow = [dateString, clientName, "0" + str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
                     wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "di"]
 
             totalComboCurveAllocatedProduction.loc[startingIndex +
