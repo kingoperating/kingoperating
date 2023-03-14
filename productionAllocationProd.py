@@ -397,4 +397,4 @@ totalComboCurveAllocatedProduction.to_json(
     r".\kingoperating\data\comboCurveAllocatedProduction.json", orient="records")
 
 
-print("Done Allocating Production")
+print("Check 2: Allocation Done")

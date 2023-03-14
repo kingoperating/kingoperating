@@ -397,4 +397,4 @@ if "successCount" in responseText:  # checks if the response text contains succe
     indexOfSuccessFail = responseText.index("successCount")
     print(responseText[indexOfSuccessFail:])
 
-print("yay")
+print("Check 3: Done with ComboCurve")
