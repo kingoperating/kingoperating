@@ -18,7 +18,7 @@ from openpyxl import Workbook
 # TIPS: ALWAYS need to have some transactions for this script to work
 
 # Set Well Name To Whatever well is needed:
-nameOfWell = "millerrancha501v"
+nameOfWell = "millerrancha501mh"
 
 # Load in all files needed
 pathOfDailyReport = '.\\kingoperating\\data\\afe' + \
