@@ -16,7 +16,7 @@ import numpy as np
 
 
 # 30 Day Or Full? If False - only looking at last 30 days and appending.
-fullProductionPull = True
+fullProductionPull = False
 numberOfDaysToPull = 35
 
 fileNameAccounting = (
@@ -150,10 +150,10 @@ todayDay = int(dateToday.strftime("%d"))
 # if not pulling all of production - then just get the list of dates to parse
 if fullProductionPull == False:
     # gets list of dates
-    listOfDates = totalAccountingAllocatedProduction["Date"].to_list()
+    listOfDates = totalComboCurveAllocatedProduction["Date"].to_list()
     # finds out what date is last
-    lastRow = totalAccountingAllocatedProduction.iloc[len(
-        totalAccountingAllocatedProduction) - 1]
+    lastRow = totalComboCurveAllocatedProduction.iloc[len(
+        totalComboCurveAllocatedProduction) - 1]
     dateOfLastRow = lastRow["Date"]
     splitDate = re.split("/", str(dateOfLastRow))  # splits date correct
     day = int(splitDate[1])  # gets the correct day
