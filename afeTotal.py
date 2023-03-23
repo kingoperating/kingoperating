@@ -336,9 +336,11 @@ for i in range(0, len(actualWellCostWolfepak)):
             [accountCodeActual, actualWellCostWolfepak.iloc[i]["{Account Desc}"], 0, actualCostClean])
 
 
+# this handles when there are actual lines that are not in the budget
+
 counter = 0
 trigger = True
-while trigger == True:
+while trigger == True and outputDataExtra != []:
     account = outputDataExtra[counter][0]
     occurences = [j for j, x in enumerate(outputDataExtra) if x[0] == account]
 
