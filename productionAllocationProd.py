@@ -16,7 +16,7 @@ import numpy as np
 
 
 # 30 Day Or Full? If False - only looking at last 30 days and appending.
-fullProductionPull = True
+fullProductionPull = False
 numberOfDaysToPull = 35
 
 fileNameAccounting = (
@@ -44,7 +44,7 @@ yesDayString = dateYes.strftime("%d")
 
 # Set production interval based on boolen
 if fullProductionPull == True:
-    productionInterval = "&start=2023-01-01&end="
+    productionInterval = "&start=2021-04-01&end="
 else:
     dateThirtyDays = dateToday - timedelta(days=numberOfDaysToPull)
     dateThirtyDaysYear = dateThirtyDays.strftime("%Y")
@@ -394,11 +394,11 @@ for currentRow in range(numEntries - 1, 0, -1):
     lastDate = dateString
 
 totalAccountingAllocatedProduction.to_csv(
-    r".\kingoperating\data\accountingAllocatedProductionTest.csv", index=False)
+    r".\kingoperating\data\accountingAllocatedProduction.csv", index=False)
 totalComboCurveAllocatedProduction.to_csv(
-    r".\kingoperating\data\comboCurveAllocatedProductionTest.csv", index=False)
+    r".\kingoperating\data\comboCurveAllocatedProduction.csv", index=False)
 totalComboCurveAllocatedProduction.to_json(
-    r".\kingoperating\data\comboCurveAllocatedProductionTest.json", orient="records")
+    r".\kingoperating\data\comboCurveAllocatedProduction.json", orient="records")
 
 
 print("Check 2: Allocation Done")
