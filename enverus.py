@@ -59,9 +59,3 @@ for i in range(0, len(dateList)):
             apiList.append(apiNumber)
             browningDate.append(browningDates)
         print("SOMETHING HAS BEEN UPDATED.....")
-    print("yay")
-
-df = d3.to_dataframe("detected-well-pads",
-                     ENVOperator="BROWNING OIL", ENVBasin="MIDLAND")
-
-df.to_csv(r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\dectedWellPadData.csv", index=False)
