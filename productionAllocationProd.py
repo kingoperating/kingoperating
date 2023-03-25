@@ -118,7 +118,8 @@ else:
         "Gas Volume",
         "Water Volume",
         "Oil Sold Volume",
-        "Data Source"
+        "Data Source",
+        "State"
     ]
     totalComboCurveAllocatedProduction = pd.DataFrame(columns=headerCombocurve)
 
@@ -175,6 +176,7 @@ accountingIdList = masterAllocationList["Subaccount"].tolist()
 apiList = masterAllocationList["API"].tolist()
 allocationOilList = masterAllocationList["Allocation Ratio Oil"].tolist()
 allocationGasList = masterAllocationList["Allocation Ratio Gas"].tolist()
+stateList = masterAllocationList["State"].tolist()
 
 kComboCurve = 0  # variable for loop
 kAccounting = 0  # variable for loop
@@ -314,13 +316,15 @@ for currentRow in range(numEntries - 1, 0, -1):
     elif clientName == "Wyoming":
         clientName = "KOWYM"
 
+    currentState = ""
+
     # CORE LOGIC FOR WELLOP
     if len(batteryIndexId) == 1:
         if batteryId != 23012 and batteryId != 23011:
             newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(oilVolumeClean), str(
                 gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean)]
             newRowComboCurve = [dateString, clientName, str(apiList[batteryIndexId[0]]), str(wellAccountingName), str(oilVolumeClean), str(
-                gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean), "di"]
+                gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean), "di", str(stateList[batteryIndexId[0]])]
 
             totalAccountingAllocatedProduction.loc[startingIndex +
                                                    kAccounting] = newRow  # sets new row to accounting
@@ -355,11 +359,11 @@ for currentRow in range(numEntries - 1, 0, -1):
             # YOU ARE HERE
             if batteryId != 25381 and batteryId != 25382:
                 newRow = [dateString, clientName, str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
-                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "di"]
+                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "di", str(stateList[batteryIndexId[0]])]
                 junk = 0
             else:
                 newRow = [dateString, clientName, "0" + str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
-                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "di"]
+                    wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), "di", str(stateList[batteryIndexId[0]])]
 
             totalComboCurveAllocatedProduction.loc[startingIndex +
                                                    kComboCurve] = newRow
