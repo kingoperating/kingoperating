@@ -59,3 +59,5 @@ for i in range(0, len(dateList)):
             apiList.append(apiNumber)
             browningDate.append(browningDates)
         print("SOMETHING HAS BEEN UPDATED.....")
+
+        print("yay")
