@@ -11,6 +11,11 @@ import os
 
 load_dotenv()
 
+# adding the Master Battery List for Analysis
+masterAllocationList = pd.read_excel(
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\masterWellAllocation.xlsx"
+)
+
 # connect to service account
 service_account = ServiceAccount.from_file(os.getenv("API_SEC_CODE_LIVE"))
 # set API Key from enviroment variable
@@ -65,11 +70,12 @@ wellIdList = []
 
 
 def process_page(response_json):
-    results = response_json[0]
-    wellId = results["well"]
-    output = results["output"]
-    print(type(output))
-    resultsList.append(output)
+    for i in range(0, len(response_json)):
+        results = response_json[i]
+        wellId = results["well"]
+        output = results["output"]
+        wellIdList.append(wellId)
+        resultsList.append(output)
 
 
 has_more = True
@@ -81,3 +87,44 @@ while has_more:
     has_more = urltwo is not None
 
 numEntries = len(resultsList)
+
+listOfBatteryIds = masterAllocationList["Id in Greasebooks"].tolist()
+wellNameAccountingList = masterAllocationList["Name in Accounting"].tolist()
+accountingIdList = masterAllocationList["Subaccount"].tolist()
+apiList = masterAllocationList["API"].tolist()
+wellIdScenariosList = masterAllocationList["Well Id"].tolist()
+
+headers = [
+    "API",
+    "Abandonment Date",
+    "Gross Oil Well Head Volume",
+    "Gross Gas Well Head Volume"
+]
+
+eurData = pd.DataFrame(columns=headers)
+
+for i in range(0, numEntries):
+    row = resultsList[i]
+    wellId = wellIdList[i]
+
+    if wellId not in wellIdScenariosList:
+        apiNumber = wellNameAccountingList[wellIdList.index(wellId)]
+        abandonmentDate = 0
+        grossOilWellHeadVolume = 0
+        grossGasWellHeadVolume = 0
+    else:
+        wellIdIndex = wellIdScenariosList.index(wellId)
+        apiNumber = apiList[wellIdIndex]
+        abandonmentDate = row["abandonmentDate"]
+        grossOilWellHeadVolume = row["grossOilWellHeadVolume"]
+        grossGasWellHeadVolume = row["grossGasWellHeadVolume"]
+
+    printRow = {"API": apiNumber, "Abandonment Date": abandonmentDate,
+                "Gross Oil Well Head Volume": grossOilWellHeadVolume, "Gross Gas Well Head Volume": grossGasWellHeadVolume}
+
+    eurData = eurData.append(printRow, ignore_index=True)
+
+eurData.to_excel(
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\eurData.xlsx")
+
+print('done')
