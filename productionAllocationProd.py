@@ -12,11 +12,11 @@ import glob
 import re
 from dotenv import load_dotenv
 import pandas as pd
-import numpy as np
+import numpy as np     
 
 
 # 30 Day Or Full? If False - only looking at last 30 days and appending.
-fullProductionPull = False
+fullProductionPull = True
 numberOfDaysToPull = 35
 
 fileNameAccounting = (
