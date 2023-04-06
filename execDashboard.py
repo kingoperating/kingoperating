@@ -125,6 +125,6 @@ for i in range(0, numEntries):
     eurData = eurData.append(printRow, ignore_index=True)
 
 eurData.to_excel(
-    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\eurData.xlsx")
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\eurDataworland.xlsx", index=False)
 
 print('done')
