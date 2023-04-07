@@ -96,6 +96,7 @@ wellIdScenariosList = masterAllocationList["Well Id"].tolist()
 
 headers = [
     "API",
+    "Well Name",
     "Abandonment Date",
     "Gross Oil Well Head Volume",
     "Gross Gas Well Head Volume"
@@ -108,19 +109,17 @@ for i in range(0, numEntries):
     wellId = wellIdList[i]
 
     if wellId not in wellIdScenariosList:
-        apiNumber = wellNameAccountingList[wellIdList.index(wellId)]
-        abandonmentDate = 0
-        grossOilWellHeadVolume = 0
-        grossGasWellHeadVolume = 0
+        continue
     else:
         wellIdIndex = wellIdScenariosList.index(wellId)
         apiNumber = apiList[wellIdIndex]
+        wellName = wellNameAccountingList[wellIdList.index(wellId)]
         abandonmentDate = row["abandonmentDate"]
         grossOilWellHeadVolume = row["grossOilWellHeadVolume"]
         grossGasWellHeadVolume = row["grossGasWellHeadVolume"]
 
-    printRow = {"API": apiNumber, "Abandonment Date": abandonmentDate,
-                "Gross Oil Well Head Volume": grossOilWellHeadVolume, "Gross Gas Well Head Volume": grossGasWellHeadVolume}
+        printRow = {"API": apiNumber, "Well Name": wellName, "Abandonment Date": abandonmentDate,
+                    "Gross Oil Well Head Volume": grossOilWellHeadVolume, "Gross Gas Well Head Volume": grossGasWellHeadVolume}
 
     eurData = eurData.append(printRow, ignore_index=True)
 
