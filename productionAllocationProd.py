@@ -12,12 +12,12 @@ import glob
 import re
 from dotenv import load_dotenv
 import pandas as pd
-import numpy as np     
+import numpy as np
 
 
 # 30 Day Or Full? If False - only looking at last 30 days and appending.
-fullProductionPull = True
-numberOfDaysToPull = 35
+fullProductionPull = False
+numberOfDaysToPull = 30
 
 fileNameAccounting = (
     r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\accountingAllocatedProduction.csv"
