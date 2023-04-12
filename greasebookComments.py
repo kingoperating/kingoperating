@@ -47,7 +47,7 @@ masterAllocationList = pd.read_excel(
 )
 
 
-productionInterval = "&start=2021-01-01&end="
+productionInterval = "&start=2023-01-01&end="
 
 # Master API call to Greasebooks
 url = (
@@ -60,7 +60,6 @@ url = (
     + "-"
     + todayDay
     + "&pageSize=250"
-    + "&page=3"
 )
 
 # make the API call

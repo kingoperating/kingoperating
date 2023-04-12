@@ -18,7 +18,7 @@ from openpyxl import Workbook
 # TIPS: ALWAYS need to have some transactions for this script to work
 
 # Set Well Name To Whatever well is needed:
-nameOfWell = "millerranchb501mh"
+nameOfWell = "wu99"
 
 # Load in all files needed
 pathOfDailyReport = '.\\kingoperating\\data\\afe' + \
@@ -172,6 +172,15 @@ for i in range(0, len(masterAfe)):
     lastMeasuredDepth = measuredDepth
 
 cumulativeCost = cumulativeCost + totalDailyCost
+
+try:
+    day = day
+    lastDate = date
+except NameError:
+    day = 0
+    lastDate = dt.datetime.today()
+    lastMeasuredDepth = 0
+
 row = plannedCostDepth.iloc[day]
 lastDateClean = lastDate.strftime("%m/%d/%Y")
 if lastDate in descriptionDateList:
