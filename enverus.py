@@ -33,6 +33,26 @@ for row in d3.query("production", API_UWI_14_UNFORMATTED="42033325890000"):
     print("Date Of Browning Well Update: " + updateDateBetter)
     print("Daily Oil Rate: " + str(totalOil/totalProdMonths))
 
+for row in d3.query("production", API_UWI_14_UNFORMATTED="420333326080000"):
+    totalProdMonths = row['ProducingDays']
+    totalOil = row['Prod_OilBBL']
+    updateDate = row['UpdatedDate']
+    if "T" in updateDate:
+        index = updateDate.index("T")
+        updateDateBetter = updateDate[0:index]
+    print("Date Of Browning Well Update: " + updateDateBetter)
+    print("Daily Oil Rate: " + str(totalOil/totalProdMonths))
+
+for row in d3.query("production", API_UWI_14_UNFORMATTED="42033326070000"):
+    totalProdMonths = row['ProducingDays']
+    totalOil = row['Prod_OilBBL']
+    updateDate = row['UpdatedDate']
+    if "T" in updateDate:
+        index = updateDate.index("T")
+        updateDateBetter = updateDate[0:index]
+    print("Date Of Browning Well Update: " + updateDateBetter)
+    print("Daily Oil Rate: " + str(totalOil/totalProdMonths))
+
 dateList = []
 browningDate = []
 apiList = []
