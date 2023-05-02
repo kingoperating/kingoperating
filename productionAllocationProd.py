@@ -6,7 +6,7 @@ from time import strftime
 from black import out
 import requests
 import os
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 import datetime as dt
 import glob
 import re
@@ -161,7 +161,7 @@ if fullProductionPull == False:
     month = int(splitDate[0])  # gets the correct month
     year = int(splitDate[2])  # gets the correct
     referenceTimeDay = dt.date(year, month, day) - \
-        timedelta(days=numberOfDaysToPull)  # creates a reference time
+        timedelta(days=15)  # creates a reference time
     dateOfInterest = referenceTimeDay.strftime(
         "%#m/%#d/%Y")  # converts to string
     startingIndex = listOfDates.index(
