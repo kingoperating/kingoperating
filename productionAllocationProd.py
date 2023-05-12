@@ -16,7 +16,7 @@ import numpy as np
 
 
 # 30 Day Or Full? If False - only looking at last 30 days and appending.
-fullProductionPull = True
+fullProductionPull = False
 numberOfDaysToPull = 30
 
 fileNameAccounting = (
@@ -165,13 +165,15 @@ if fullProductionPull == False:
     # gets list of dates
     listOfDates = totalComboCurveAllocatedProduction["Date"].to_list()
     # finds out what date is last
-    lastRow = totalComboCurveAllocatedProduction.iloc[len(
-        totalComboCurveAllocatedProduction) - 1]
-    dateOfLastRow = lastRow["Date"]
-    splitDate = re.split("/", str(dateOfLastRow))  # splits date correct
-    day = int(splitDate[1])  # gets the correct day
-    month = int(splitDate[0])  # gets the correct month
-    year = int(splitDate[2])  # gets the correct
+    lastRow = results[0]
+    # lastRow = totalComboCurveAllocatedProduction.iloc[len(
+    #    totalComboCurveAllocatedProduction) - 1]
+    dateOfLastRow = lastRow["date"]
+    splitDate = re.split("T", str(dateOfLastRow))  # splits date correct
+    splitDate2 = re.split("-", str(splitDate[0]))  # splits date correct
+    day = int(splitDate2[2])  # gets the correct day
+    month = int(splitDate2[1])  # gets the correct month
+    year = int(splitDate2[0])  # gets the correct
     referenceTimeDay = dt.date(year, month, day) - \
         timedelta(days=numberOfDaysToPull)  # creates a reference time
     dateOfInterest = referenceTimeDay.strftime(
@@ -217,6 +219,10 @@ for currentRow in range(numEntries - 1, 0, -1):
     for idx, key in enumerate(keys):
         if key[0] == "batteryId":
             batteryId = row["batteryId"]
+            if batteryId == 23012:
+                junk = 1
+            if batteryId == 23011:
+                junnk = 1
         elif key[0] == "batteryName":
             batteryName = row["batteryName"]
         elif key[0] == "date":
@@ -300,7 +306,7 @@ for currentRow in range(numEntries - 1, 0, -1):
         welopOilVolume = 0
         welopWaterVolume = 0
         welopOilSalesVolume = 0
-        adamsRanchCounter = 0
+       # adamsRanchCounter = 0
         adamsRanchGasVolume = 0
         adamsRanchOilSalesVolume = 0
         adamsRanchOilVolume = 0
@@ -347,14 +353,13 @@ for currentRow in range(numEntries - 1, 0, -1):
         gasVolumeForecast = 0
         waterVolumeForecast = 0
 
-    # CORE LOGIC FOR WELLOP
+    # CORE LOGIC FOR WELOP
     if len(batteryIndexId) == 1:
-        if batteryId != 23012 and batteryId != 23011:
-
+        if batteryId != 23012:
             newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(oilVolumeClean), str(
                 gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean), str(oilVolumeForecast), str(gasVolumeForecast), str(waterVolumeForecast)]
-            newRowComboCurve = [dateString, clientName, str(apiList[batteryIndexId[0]]), str(wellAccountingName), str(oilVolumeClean), str(
-                gasVolumeClean), str(waterVolumeClean), str(oilSalesDataClean), str(oilVolumeForecast), str(gasVolumeForecast), str(waterVolumeForecast), "di", str(stateList[batteryIndexId[0]])]
+            newRowComboCurve = [dateString, clientName, str(apiList[batteryIndexId[0]]), str(wellAccountingName), str(oilVolumeClean), str(gasVolumeClean), str(
+                waterVolumeClean), str(oilSalesDataClean), str(oilVolumeForecast), str(gasVolumeForecast), str(waterVolumeForecast), "di", str(stateList[batteryIndexId[0]])]
 
             totalAccountingAllocatedProduction.loc[startingIndex +
                                                    kAccounting] = newRow  # sets new row to accounting
@@ -363,22 +368,22 @@ for currentRow in range(numEntries - 1, 0, -1):
             kComboCurve = kComboCurve + 1  # counter for combo curve
             kAccounting = kAccounting + 1  # counter for accounting
 
-        if batteryId == 23012 or batteryId == 23011:
-            adamsRanchOilVolume = adamsRanchOilVolume + oilVolumeClean
-            adamsRanchGasVolume = adamsRanchGasVolume + gasVolumeClean
-            adamsRanchWaterVolume = adamsRanchWaterVolume + waterVolumeClean
-            adamsRanchOilSalesVolume = adamsRanchOilSalesVolume + oilSalesDataClean
-            adamsRanchCounter = adamsRanchCounter + 1
+        # if batteryId == 23012:
+        #     adamsRanchOilVolume = adamsRanchOilVolume + wellOilVolume
+        #     adamsRanchGasVolume = adamsRanchGasVolume + wellGasVolume
+        #     adamsRanchWaterVolume = adamsRanchWaterVolume + wellWaterVolume
+        #     adamsRanchOilSalesVolume = adamsRanchOilSalesVolume + wellOilSalesVolume
+        #     adamsRanchCounter = adamsRanchCounter + 1
 
-        # Handles Adams Ranch and the case where 2 wells feed into 1 subaccount but 2 batteries
-        if adamsRanchCounter == 2:
+        # # Handles Adams Ranch and the case where 2 wells feed into 1 subaccount but 2 batteries
+        # if adamsRanchCounter == 2:
 
-            newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(adamsRanchOilVolume), str(
-                adamsRanchGasVolume), str(adamsRanchWaterVolume), str(adamsRanchOilSalesVolume), str(oilVolumeForecast), str(gasVolumeForecast), str(waterVolumeForecast)]
-            totalAccountingAllocatedProduction.loc[startingIndex +
-                                                   kAccounting] = newRow
-            kAccounting = kAccounting + 1
-            adamsRanchCounter = 0
+        #     newRow = [dateString, clientName, str(subAccountId), str(wellAccountingName), str(adamsRanchOilVolume), str(
+        #         adamsRanchGasVolume), str(adamsRanchWaterVolume), str(adamsRanchOilSalesVolume), str(oilVolumeForecast), str(gasVolumeForecast), str(waterVolumeForecast)]
+        #     totalAccountingAllocatedProduction.loc[startingIndex +
+        #                                            kAccounting] = newRow
+        #     kAccounting = kAccounting + 1
+        #     adamsRanchCounter = 0
 
     elif len(batteryIndexId) > 1:
         for j in range(len(batteryIndexId)):
@@ -387,8 +392,7 @@ for currentRow in range(numEntries - 1, 0, -1):
             wellWaterVolume = waterVolumeClean * allocationRatioOil[j]/100
             wellOilSalesVolume = oilSalesDataClean * allocationRatioOil[j]/100
 
-            # YOU ARE HERE
-            if batteryId != 25381 and batteryId != 25382:
+            if batteryId != 25381 and batteryId != 25382:  # COLORADO
                 newRow = [dateString, clientName, str(apiList[batteryIndexId[j]]), str(wellAccountingName[j]), str(wellOilVolume), str(
                     wellGasVolume), str(wellWaterVolume), str(wellOilSalesVolume), str(oilVolumeForecast), str(gasVolumeForecast), str(waterVolumeForecast), "di", str(stateList[batteryIndexId[0]])]
                 junk = 0
@@ -407,6 +411,7 @@ for currentRow in range(numEntries - 1, 0, -1):
                                                        kAccounting] = newRow
                 kAccounting = kAccounting + 1
 
+        # OUTSIDE OF LOOP
         if batteryId == 25381 or batteryId == 25382:
             welopOilVolume = welopOilVolume + oilVolumeClean
             welopGasVolume = welopGasVolume + gasVolumeClean
