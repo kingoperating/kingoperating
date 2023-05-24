@@ -4,9 +4,8 @@ import datetime as dt
 import re
 import pandas as pd
 
-# Function to authenticate JOYN API - returns idToke used as header for authorization in other API calls
 
-
+# Function to split date from JOYN API into correct format - returns date in format of 5/17/2023 from format of 2023-05-17T00:00:00
 def splitDate(badDate):
     splitDate = re.split("T", date)
     splitDate2 = re.split("-", splitDate[0])
@@ -16,6 +15,8 @@ def splitDate(badDate):
     dateString = str(month) + "/" + str(day) + "/" + str(year)
 
     return dateString
+
+# Function to authenticate JOYN API - returns idToke used as header for authorization in other API calls
 
 
 def getIdToken():
@@ -60,16 +61,20 @@ while nextPage == True:  # loop through all pages of data
     url = url + str(pageNumber)  # add page number to url
     response = requests.request("GET", url, headers={"Authorization": idToken})
     if response.status_code == 200:
-        print("Successful JOYN Reading Data API Call")
+        continue
+    else:
+        print(response.status_code)
+
     print("Length of Response: " + str(len(response.json())))
 
     resultsReadingType = response.json()
     totalResults.append(resultsReadingType)
 
     if len(resultsReadingType) == 0:
+        # triggers while loop to end when no more data is returned and length of response is 0
         nextPage = False
-    pageNumber = pageNumber + 1
-    url = url[:-1]
+    pageNumber = pageNumber + 1  # increment page number by 1 for pagination
+    url = url[:-1]  # removes last character from url to reset for next page
 
 readingVolume = 0
 
