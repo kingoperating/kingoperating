@@ -60,9 +60,8 @@ totalResults = []  # create empty list to store results
 while nextPage == True:  # loop through all pages of data
     url = url + str(pageNumber)  # add page number to url
     response = requests.request("GET", url, headers={"Authorization": idToken})
-    if response.status_code == 200:
-        continue
-    else:
+
+    if response.status_code != 200:
         print(response.status_code)
 
     print("Length of Response: " + str(len(response.json())))
