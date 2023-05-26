@@ -3,9 +3,17 @@ import json
 import datetime as dt
 import re
 import pandas as pd
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+login = os.getenv('JOYN_USERNAME')
+password = os.getenv('JOYN_PASSWORD')
 
 # Function to split date from JOYN API into correct format - returns date in format of 5/17/2023 from format of 2023-05-17T00:00:00
+
+
 def splitDate(badDate):
     splitDate = re.split("T", date)
     splitDate2 = re.split("-", splitDate[0])
@@ -20,12 +28,18 @@ def splitDate(badDate):
 
 
 def getIdToken():
+
+    load_dotenv()
+
+    login = os.getenv("JOYN_USERNAME")
+    password = os.getenv("JOYN_PASSWORD")
+
     # User Token API
     url = "https://api.joyn.ai/common/user/token"
     # Payload for API - use JOYN crdentials
     payload = {
-        "uname": "mtanner@kingoperating.com",
-        "pwd": "Bigshow1637%"
+        "uname": str(login),
+        "pwd": str(password)
     }
     # Headers for API - make sure to use content type of json
     headers = {
@@ -51,7 +65,7 @@ def getIdToken():
 idToken = getIdToken()  # get idToken from authJoyn function
 
 # set correct URL for Reading Data API JOYN - use idToken as header for authorization
-url = "https://api-fdg.joyn.ai/admin/api/ReadingData?isCustom=true&entityids=15408&fromdate=2023-05-17&todate=2023-05-21&pagesize=1000&pagenumber="
+url = "https://api-fdg.joyn.ai/admin/api/ReadingData?isCustom=true&entityids=15408&fromdate=2023-05-24&todate=2023-05-26&pagesize=1000&pagenumber="
 
 pageNumber = 1  # set page number to 1
 nextPage = True
@@ -59,8 +73,8 @@ totalResults = []  # create empty list to store results
 
 while nextPage == True:  # loop through all pages of data
     url = url + str(pageNumber)  # add page number to url
+    # makes the request to the API
     response = requests.request("GET", url, headers={"Authorization": idToken})
-
     if response.status_code != 200:
         print(response.status_code)
 
@@ -98,4 +112,5 @@ for i in range(0, len(totalResults)):
 
 totalAssetProduction.to_csv(
     r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\totalAssetProductionJoyn.csv", index=False)
+
 print("yay")
