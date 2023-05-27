@@ -65,7 +65,7 @@ def getIdToken():
 idToken = getIdToken()  # get idToken from authJoyn function
 
 # set correct URL for Reading Data API JOYN - use idToken as header for authorization
-url = "https://api-fdg.joyn.ai/admin/api/ReadingData?isCustom=true&entityids=15408&fromdate=2023-05-24&todate=2023-05-26&pagesize=1000&pagenumber="
+url = "https://api-fdg.joyn.ai/admin/api/ReadingData?isCustom=true&entityids=15408&fromdate=2023-05-25&todate=2023-05-26&pagesize=1000&pagenumber="
 
 pageNumber = 1  # set page number to 1
 nextPage = True
