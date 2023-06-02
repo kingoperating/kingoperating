@@ -8,13 +8,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+masterAllocationData = pd.read_excel(
+    r"C:\Users\mtanner\OneDrive - King Operating\KOC Datawarehouse\master\masterWellAllocation.xlsx")
+
+joynIdList = masterAllocationData["JOYN Id"].tolist()
+apiNumberList = masterAllocationData["API"].tolist()
+wellAccountingNameList = masterAllocationData["Name in Accounting"].tolist()
+
 login = os.getenv('JOYN_USERNAME')
 password = os.getenv('JOYN_PASSWORD')
 
 # Function to split date from JOYN API into correct format - returns date in format of 5/17/2023 from format of 2023-05-17T00:00:00
 
 
-def splitDate(badDate):
+def splitDateFunction(badDate):
     splitDate = re.split("T", date)
     splitDate2 = re.split("-", splitDate[0])
     year = int(splitDate2[0])
@@ -60,12 +67,47 @@ def getIdToken():
 
     return idToken
 
+# Function to change product type to Oil, Gas, or Water
+
+
+def switchProductType(product):
+    if product == 760010:
+        product = "Gas"
+    elif product == 760011:
+        product = "Oil"
+    elif product == 760012:
+        product = "Water"
+    else:
+        product = "Unknown"
+
+    return product
+
+
+def getApiNumber(uuid):
+    if uuid in joynIdList:
+        index = joynIdList.index(uuid)
+        apiNumberYay = apiNumberList[index]
+    else:
+        apiNumberYay = "Unknown"
+
+    return apiNumberYay
+
+
+def getName(apiNumber2):
+    if apiNumber2 in apiNumberList:
+        index = apiNumberList.index(apiNumber2)
+        name = wellAccountingNameList[index]
+    else:
+        name = "Unknown"
+
+    return name
+
 
 # Begin Script
 idToken = getIdToken()  # get idToken from authJoyn function
 
 # set correct URL for Reading Data API JOYN - use idToken as header for authorization
-url = "https://api-fdg.joyn.ai/admin/api/ReadingData?isCustom=true&entityids=15408&fromdate=2023-05-25&todate=2023-05-26&pagesize=1000&pagenumber="
+url = "https://api-fdg.joyn.ai/admin/api/ReadingData?isCustom=true&entityids=15408&fromdate=2023-04-01&todate=2023-06-03&pagesize=1000&pagenumber="
 
 pageNumber = 1  # set page number to 1
 nextPage = True
@@ -91,26 +133,50 @@ while nextPage == True:  # loop through all pages of data
 
 readingVolume = 0
 
-headers = ["AssetId", "ReadingVolume", "NetworkName", "Date", "Product"]
+headers = ["AssetId", "Name", "ReadingVolume",
+           "NetworkName", "Date", "Product", "Disposition"]
 totalAssetProduction = pd.DataFrame(columns=headers)
 
 for i in range(0, len(totalResults)):
     for j in range(0, len(totalResults[i])):
+
         # JOYN unquie ID for each asset
-        assetId = totalResults[i][j]["assetId"]
+        uuidRaw = totalResults[i][j]["assetId"]
+        apiNumber = getApiNumber(uuidRaw)
+        wellName = getName(apiNumber)
         # reading volume for current allocation row
         readingVolume = totalResults[i][j]["Volume"]
         # network name for current allocation row
         networkName = totalResults[i][j]["NetworkName"]
         # reading date for current allocation row
         date = totalResults[i][j]["ReadingDate"]
-        dateBetter = splitDate(date)  # runs splitdate() into correct format
-        product = totalResults[i][j]["Product"]
-        row = [assetId, readingVolume, networkName, dateBetter, product]
+        # runs splitdate() into correct format
+        dateBetter = splitDateFunction(date)
+        # product type for current allocation row
+        productName = totalResults[i][j]["Product"]
+        # runs switchProductType() to get correct product type
+        newProduct = switchProductType(productName)
+        # disposition for current allocation row
+        disposition = totalResults[i][j]["Disposition"]
+
+        # only want to include rows with disposition of 760096 which is production
+        if disposition != 760096:
+            continue
+        # create row to append to dataframe
+        row = [apiNumber, wellName, readingVolume, networkName,
+               dateBetter, newProduct, disposition]
+        # append row to dataframe
         totalAssetProduction.loc[len(totalAssetProduction)] = row
 
+totalAssetProduction["Date"] = pd.to_datetime(
+    totalAssetProduction["Date"])
 
-totalAssetProduction.to_csv(
+totalAssetProductionSorted = totalAssetProduction.sort_values(by=[
+    "Date"])
+
+
+# export dataframe to csv
+totalAssetProductionSorted.to_csv(
     r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\totalAssetProductionJoyn.csv", index=False)
 
 print("yay")
