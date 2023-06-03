@@ -12,6 +12,9 @@ load_dotenv()
 masterAllocationData = pd.read_excel(
     r"C:\Users\mtanner\OneDrive - King Operating\KOC Datawarehouse\master\masterWellAllocation.xlsx")
 
+forecastedProductionData = pd.read_csv(
+    r"C:\Users\mtanner\OneDrive - King Operating\KOC Datawarehouse\production\forecastWellsFinal.csv")
+
 joynIdList = masterAllocationData["JOYN Id"].tolist()
 apiNumberList = masterAllocationData["API"].tolist()
 wellAccountingNameList = masterAllocationData["Name in Accounting"].tolist()
@@ -83,6 +86,8 @@ def switchProductType(product):
 
     return product
 
+# Function to get API number from JOYN ID using masterAllocationSheet
+
 
 def getApiNumber(uuid):
     if uuid in joynIdList:
@@ -117,10 +122,10 @@ totalResults = []  # create empty list to store results
 while nextPage == True:  # loop through all pages of data
     url = urlBase + str(pageNumber)
     # makes the request to the API
+
     response = requests.request("GET", url, headers={"Authorization": idToken})
     if response.status_code != 200:
         print(response.status_code)
-        print("yay")
 
     print("Length of Response: " + str(len(response.json())))
 
@@ -169,28 +174,34 @@ for i in range(0, len(totalResults)):
         # only want to include rows with disposition of 760096 which is production
         if disposition != 760096:
             continue
+
+        # get forecasted volume for current allocation row
+
         # create row to append to dataframe
         row = [apiNumber, wellName, readingVolume, networkName,
                dateBetter, newProduct, disposition]
         # append row to dataframe
         rawTotalAssetProduction.loc[len(rawTotalAssetProduction)] = row
 
+# convert date column to datetime format for sorting purposes
 rawTotalAssetProduction["Date"] = pd.to_datetime(
     rawTotalAssetProduction["Date"])
-
+# sort dataframe by date for loop to get daily production
 rawTotalAssetProductionSorted = rawTotalAssetProduction.sort_values(by=[
     "Date"])
 
+# Setting some initial variables for loop
 dailyRawProduction = np.zeros([200, 3])
 dailyRawAssetId = []
 dailyRawWellName = []
 dailyRawDate = []
 priorDate = -999
-
 counter = 0
 lastIndex = 0
 
+# Master Loop Through the raw production data to pivot from 3 records per well per date to one record per well per date with 3 columns: Oil, Gas, Water
 for i in range(0, len(rawTotalAssetProductionSorted)):
+    # get current row
     row = rawTotalAssetProductionSorted.iloc[i]
     apiNumberPivot = row["AssetId"]
     readingVolumePivot = row["ReadingVolume"]
@@ -233,6 +244,7 @@ for i in range(0, len(rawTotalAssetProductionSorted)):
         counter = counter + 1
 
     priorDate = datePivot
+
 
 # export dataframe to csv
 finalTotalAssetProduction.to_csv(
