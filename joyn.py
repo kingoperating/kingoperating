@@ -248,6 +248,6 @@ for i in range(0, len(rawTotalAssetProductionSorted)):
 
 # export dataframe to csv
 finalTotalAssetProduction.to_csv(
-    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\totalAssetProductionJoyn.csv", index=False)
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\totalAssetProductionJoynGOOD.csv", index=False)
 
 print("yay")
