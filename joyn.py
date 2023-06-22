@@ -109,11 +109,54 @@ def getName(apiNumber2):
     return name
 
 
+def getForecast(apiNumber, date):
+
+    indexList = [index for index, value in enumerate(
+        forecastedProductionData["API 14"].to_list()) if value == apiNumber]
+
+    # Gets the forecasted prodcution for the current date
+    forecastedDateList = [forecastedProductionData["Date"][index]
+                          for index in indexList]
+
+    # finds the index of the current date in the forecasted data and sets to the current forecasted volume
+    if date in forecastedDateList:
+        forecastedIndex = forecastedDateList.index(date)
+        oilVolumeForecast = forecastedProductionData["Oil"][indexList[forecastedIndex]]
+        gasVolumeForecast = forecastedProductionData["Gas"][indexList[forecastedIndex]]
+        waterVolumeForecast = forecastedProductionData["Water"][indexList[forecastedIndex]]
+    else:
+        oilVolumeForecast = 0
+        gasVolumeForecast = 0
+        waterVolumeForecast = 0
+
+    return oilVolumeForecast, gasVolumeForecast, waterVolumeForecast
+
+
+def getState(apiNumber):
+    if apiNumber in apiNumberList:
+        index = apiNumberList.index(apiNumber)
+        state = masterAllocationData["State"][index]
+    else:
+        state = "Unknown"
+
+    return state
+
+
+def getClient(apiNumber):
+    if apiNumber in apiNumberList:
+        index = apiNumberList.index(apiNumber)
+        client = masterAllocationData["Asset Group"][index]
+    else:
+        client = "Unknown"
+
+    return client
+
+
 # Begin Script
 idToken = getIdToken()  # get idToken from authJoyn function
 
 # set correct URL for Reading Data API JOYN - use idToken as header for authorization
-urlBase = "https://api-fdg.joyn.ai/admin/api/ReadingData?isCustom=true&entityids=15408&fromdate=2023-01-01&todate=2023-06-03&pagesize=1000&pagenumber="
+urlBase = "https://api-fdg.joyn.ai/admin/api/ReadingData?isCustom=true&entityids=15408&fromdate=2023-06-21&todate=2023-06-22&pagesize=1000&pagenumber="
 
 pageNumber = 1  # set page number to 1
 nextPage = True
@@ -146,18 +189,35 @@ rawTotalAssetProduction = pd.DataFrame(columns=headers)
 
 headersFinal = ["API Number", "Well Name", "Date",
                 "Oil Volume", "Gas Volume", "Water Volume"]
+
+headersMerge = [
+    "Date",
+    "Client",
+    "API",
+    "Well Accounting Name",
+    "Oil Volume",
+    "Gas Volume",
+    "Water Volume",
+    "Oil Sold Volume",
+    "Oil Forecast",
+    "Gas Forecast",
+    "Water Forecast",
+    "Data Source",
+    "State"
+]
 finalTotalAssetProduction = pd.DataFrame(columns=headersFinal)
 
+dataSource = "di"
 
 for i in range(0, len(totalResults)):
     for j in range(0, len(totalResults[i])):
-
         # JOYN unquie ID for each asset
         uuidRaw = totalResults[i][j]["assetId"]
         apiNumber = getApiNumber(uuidRaw)
         wellName = getName(apiNumber)
         # reading volume for current allocation row
         readingVolume = totalResults[i][j]["Volume"]
+        isDeleted = totalResults[i][j]["IsDeleted"]
         # network name for current allocation row
         networkName = totalResults[i][j]["NetworkName"]
         # reading date for current allocation row
@@ -171,15 +231,15 @@ for i in range(0, len(totalResults)):
         # disposition for current allocation row
         disposition = totalResults[i][j]["Disposition"]
 
-        # only want to include rows with disposition of 760096 which is production
-        if disposition != 760096:
+        if disposition == 760098 or disposition == 760101:
+            oilSalesVolume = readingVolume
+
+        if disposition == 760096 or disposition == 760101 or disposition == 760098:
+            row = [apiNumber, wellName, readingVolume, networkName,
+                   dateBetter, newProduct, disposition]
+        else:
             continue
 
-        # get forecasted volume for current allocation row
-
-        # create row to append to dataframe
-        row = [apiNumber, wellName, readingVolume, networkName,
-               dateBetter, newProduct, disposition]
         # append row to dataframe
         rawTotalAssetProduction.loc[len(rawTotalAssetProduction)] = row
 
@@ -208,6 +268,8 @@ for i in range(0, len(rawTotalAssetProductionSorted)):
     productTypePivot = row["Product"]
     datePivot = row["Date"]
     wellNamePivot = getName(apiNumberPivot)
+    # stateName = getState(apiNumberPivot)
+    # clientName = getClient(apiNumberPivot)
 
     if datePivot != priorDate and priorDate != -999:
         for j in range(0, counter):
@@ -245,9 +307,15 @@ for i in range(0, len(rawTotalAssetProductionSorted)):
 
     priorDate = datePivot
 
+  # get forecasted volume for current allocation row
+
+    # Get State name
+
+    # create row to append to dataframe
+
 
 # export dataframe to csv
 finalTotalAssetProduction.to_csv(
-    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\totalAssetProductionJoynGOOD.csv", index=False)
+    r"C:\Users\mtanner\OneDrive - King Operating\Documents 1\code\kingoperating\data\totalAssetProductionJoynGOODBESTTEST_62223.csv", index=False)
 
 print("yay")
